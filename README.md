@@ -1,24 +1,39 @@
 # audio_to_midi_converter
 
-Offline C++ and Python pipelines for converting YouTube piano performances (including room noise) into MIDI.
+Python CLI for converting noisy YouTube piano performances to MIDI.
 
-## Python CLI (Implemented)
+## What this does
+- Downloads YouTube audio (`yt-dlp`)
+- Converts media to WAV (`ffmpeg`)
+- Preprocesses audio (normalize, high-pass, optional denoise)
+- Transcribes with piano-focused backend (`piano-transcription-inference`) or fallback (`basic-pitch`)
+- Writes output MIDI
 
-This repository now includes a Python implementation of the pipeline with:
-- YouTube download and cache (`yt-dlp`)
-- WAV extraction (`ffmpeg`)
-- Preprocessing (normalize, high-pass, optional denoise)
-- Transcription backend abstraction (`piano-transcription-inference`, fallback `basic-pitch`)
-- MIDI writing
+## Requirements
+- Python `3.10+`
+- `ffmpeg` on `PATH`
+- `yt-dlp` on `PATH` or in the Python environment
+- Network access for YouTube download and first PTI checkpoint download
+- Optional: `curl` for checkpoint download fallback
 
-### Quick start
+## Setup
+1. Create venv
 ```bash
 scripts/venv_create.sh
+```
+
+2. Install runtime dependencies
+```bash
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Run
+Alternative without activating shell:
+```bash
+.venv/bin/pip install -r requirements.txt
+```
+
+## Run
 ```bash
 scripts/run_audio2midi.sh \
   --youtube-url "https://www.youtube.com/watch?v=VIDEO_ID" \
@@ -27,81 +42,64 @@ scripts/run_audio2midi.sh \
   --keep-intermediate
 ```
 
-### PTI checkpoint note
-- `piano-transcription-inference` requires a `.pth` checkpoint.
-- The app now downloads it directly via Python (no `wget` required).
-- If Python download fails, it automatically falls back to `curl` when available.
-- Optional override:
+## CLI options
+```bash
+scripts/run_audio2midi.sh --help
+```
+
+Key options:
+- `--backend {pti,piano-transcription-inference,basic-pitch}`
+- `--device cpu|cuda`
+- `--denoise`
+- `--min-duration <seconds>`
+- `--note-threshold <0..1>`
+- `--quantize-grid-seconds <seconds>`
+- `--pti-checkpoint-path /path/to/model.pth`
+
+## PTI model details
+- Default backend is `pti` (`piano-transcription-inference`)
+- Default checkpoint filename:
+`note_F1=0.9677_pedal_F1=0.9186.pth`
+- Default checkpoint location:
+`~/piano_transcription_inference_data/note_F1=0.9677_pedal_F1=0.9186.pth`
+- If missing, checkpoint is downloaded automatically
+- Download flow: Python HTTP first, then `curl` fallback
+
+Overrides:
+- Local checkpoint path:
 ```bash
 scripts/run_audio2midi.sh \
   --youtube-url "https://www.youtube.com/watch?v=VIDEO_ID" \
   --output out.mid \
   --pti-checkpoint-path "/path/to/note_F1=0.9677_pedal_F1=0.9186.pth"
 ```
-- Optional URL override (advanced):
+- Checkpoint URL (advanced):
 ```bash
-export AUDIO2MIDI_PTI_CHECKPOINT_URL="https://example.com/note_model.pth"
+export AUDIO2MIDI_PTI_CHECKPOINT_URL="https://example.com/model.pth"
+```
+- Checkpoint path via env:
+```bash
+export AUDIO2MIDI_PTI_CHECKPOINT_PATH="/path/to/model.pth"
 ```
 
-### Optional: launch activated shell
+## Troubleshooting
+- `ffmpeg extraction failed`: verify `ffmpeg -version` works and input file is readable.
+- `piano-transcription-inference failed`: rerun with `--pti-checkpoint-path` to a valid local `.pth`.
+- First PTI run can take time on CPU and may be quiet while inference runs.
+- If PTI dependency compatibility blocks execution, try:
 ```bash
-scripts/venv_activate.sh
+scripts/run_audio2midi.sh \
+  --youtube-url "https://www.youtube.com/watch?v=VIDEO_ID" \
+  --output out.mid \
+  --backend basic-pitch
 ```
 
-### Run tests
+## Dev/test
 ```bash
+source .venv/bin/activate
 pip install -r requirements-dev.txt
 pytest -q
 ```
 
-## Prerequisites
-
-### Required tools
-- C++17 compiler (`clang++` or `g++`)
-- CMake
-- ONNX Runtime C/C++ package
-- `ffmpeg`
-- `yt-dlp`
-
-### Install on macOS (Homebrew)
-```bash
-xcode-select --install
-brew install cmake ffmpeg yt-dlp
-```
-
-### Install on Ubuntu/Debian
-```bash
-sudo apt update
-sudo apt install -y build-essential cmake ffmpeg python3-pip
-python3 -m pip install -U yt-dlp
-```
-
-### Install ONNX Runtime (C/C++ API)
-Use the official ONNX Runtime install/docs pages and download a prebuilt C/C++ release archive (`.tgz`/`.zip`) for your platform from GitHub releases.
-
-1. Open:
-- https://onnxruntime.ai/docs/install/
-- https://onnxruntime.ai/docs/get-started/with-cpp.html
-- https://github.com/microsoft/onnxruntime/releases
-
-2. Download the asset matching your platform, for example:
-- `onnxruntime-osx-arm64-<version>.tgz`
-- `onnxruntime-linux-x64-<version>.tgz`
-
-3. Extract it to a local folder, for example:
-```bash
-mkdir -p third_party
-tar -xzf ~/Downloads/onnxruntime-<platform>-<version>.tgz -C third_party
-```
-
-4. Point CMake at the extracted directory when configuring:
-```bash
-cmake -S . -B build -DCMAKE_PREFIX_PATH="$PWD/third_party/onnxruntime-<platform>-<version>"
-```
-
-## Verify prerequisite installation
-```bash
-cmake --version
-ffmpeg -version
-yt-dlp --version
-```
+## Notes
+- Historical C++ planning docs are kept in `C_PLAN.md` and `C_RESEARCH.md`.
