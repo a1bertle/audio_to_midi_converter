@@ -30,6 +30,7 @@ Build an offline Python tool that converts YouTube piano performance videos (inc
 ### Software Requirements
 - Python 3.10+ runtime.
 - `pip` for dependency installation.
+- `venv` module for isolated environments (`python -m venv .venv`).
 - `yt-dlp` Python package (or CLI) available at runtime.
 - `ffmpeg` installed and accessible on `PATH`.
 - `piano-transcription-inference` package for primary transcription backend.
@@ -93,6 +94,7 @@ audio2midi \
 ## Dependencies
 - Runtime:
 - Python 3.10+
+- `venv` (standard library)
 - `yt-dlp`
 - `ffmpeg` (system binary)
 - `numpy`
@@ -107,6 +109,20 @@ audio2midi \
 - `pytest-cov`
 - `ruff`
 
+## Environment Setup
+1. Create venv
+- `python3 -m venv .venv`
+
+2. Activate venv (manual)
+- macOS/Linux: `source .venv/bin/activate`
+
+3. Install dependencies
+- `pip install -r requirements.txt`
+
+4. Launch helper scripts
+- `scripts/venv_create.sh` creates `.venv` if missing.
+- `scripts/venv_activate.sh` prints activation command and opens an interactive shell with `.venv` activated.
+
 ## Package/Layout Plan
 - `audio2midi/cli.py`: CLI parsing and top-level orchestration
 - `audio2midi/downloader.py`: URL validation, cache logic, yt-dlp integration
@@ -117,6 +133,8 @@ audio2midi \
 - `audio2midi/transcribers/basic_pitch.py`: fallback backend
 - `audio2midi/postprocess.py`: event cleanup and pedal-aware adjustments
 - `audio2midi/midi_writer.py`: final MIDI emission
+- `scripts/venv_create.sh`: create local virtual environment
+- `scripts/venv_activate.sh`: open shell with virtual environment activated
 - `tests/`: unit and integration tests
 
 ## Error Handling
@@ -128,6 +146,7 @@ audio2midi \
 ## Milestones
 1. Scaffold
 - Python package skeleton, CLI parsing, module interfaces.
+- Add `scripts/venv_create.sh` and `scripts/venv_activate.sh`.
 
 2. Ingestion
 - Implement downloader + extractor with cache and retries.

@@ -1,2 +1,25 @@
+# User custom instructions
 CLAUDE.md
 AGENTS.md
+
+# Local environments
+.venv/
+venv/
+
+# Runtime/cache artifacts
+.cache/
+__pycache__/
+*.py[cod]
+
+# Test/tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local outputs
+*.mid
