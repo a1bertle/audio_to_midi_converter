@@ -1,0 +1,6 @@
+-r requirements-dev.txt
+jupyterlab>=4.0
+ipykernel>=6.0
+nbformat>=5.0
+nbclient>=0.10
+seaborn>=0.13
