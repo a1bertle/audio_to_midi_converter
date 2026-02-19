@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import re
 import sys
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from audio2midi.downloader import YouTubeDownloader
 from audio2midi.exceptions import Audio2MidiError
 from audio2midi.extractor import extract_to_wav
 from audio2midi.midi_writer import write_midi_file
+from audio2midi.models import Instrument
 from audio2midi.postprocess import postprocess_transcription
 from audio2midi.preprocess import preprocess_wav_file
 from audio2midi.transcribers.base import create_transcriber
@@ -23,12 +25,17 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="audio2midi",
         description=(
-            "Convert noisy YouTube piano performances into MIDI files. "
-            "This command runs completely on-device after download."
+            "Convert YouTube audio performances into MIDI files. "
+            "Supports piano (default) and guitar instruments. "
+            "Runs completely on-device after download."
         ),
     )
     parser.add_argument("--youtube-url", required=True, help="YouTube video URL.")
-    parser.add_argument("--output", required=True, help="Output MIDI path.")
+    parser.add_argument(
+        "--output",
+        default=None,
+        help="Output MIDI path. Defaults to video title with spaces replaced by underscores.",
+    )
     parser.add_argument(
         "--workdir",
         default=".cache/audio2midi",
@@ -46,10 +53,16 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--retries", type=int, default=3, help="Download retry count.")
     parser.add_argument(
+        "--instrument",
+        default="piano",
+        choices=["piano", "guitar"],
+        help="Target instrument (default: piano). Guitar uses basic-pitch with tuned parameters.",
+    )
+    parser.add_argument(
         "--backend",
-        default="pti",
+        default=None,
         choices=["pti", "piano-transcription-inference", "basic-pitch"],
-        help="Transcription backend.",
+        help="Transcription backend. Default depends on instrument (pti for piano, basic-pitch for guitar).",
     )
     parser.add_argument(
         "--device",
@@ -93,9 +106,16 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _sanitize_filename(title: str) -> str:
+    """Convert a video title to a safe filename with underscores."""
+    name = title.strip()
+    name = re.sub(r"[^\w\s-]", "", name)
+    name = re.sub(r"[\s]+", "_", name)
+    return name or "output"
+
+
 def run_pipeline(args: argparse.Namespace) -> Path:
     """Run the end-to-end audio2midi pipeline."""
-    output_path = Path(args.output).expanduser().resolve()
     workdir = Path(args.workdir).expanduser().resolve()
     extracted_dir = workdir / "extracted"
     preprocessed_dir = workdir / "preprocessed"
@@ -106,6 +126,12 @@ def run_pipeline(args: argparse.Namespace) -> Path:
         allow_playlist=args.allow_playlist,
     )
     download_result = downloader.download(args.youtube_url)
+
+    if args.output:
+        output_path = Path(args.output).expanduser().resolve()
+    else:
+        filename = _sanitize_filename(download_result.title or download_result.video_id)
+        output_path = Path(f"{filename}.mid").resolve()
     raw_wav_path = extracted_dir / f"{download_result.video_id}.wav"
     processed_wav_path = preprocessed_dir / f"{download_result.video_id}.wav"
 
@@ -119,9 +145,11 @@ def run_pipeline(args: argparse.Namespace) -> Path:
         denoise=args.denoise,
     )
 
-    LOGGER.info("Running transcription backend: %s", args.backend)
+    instrument = Instrument(args.instrument)
+    LOGGER.info("Running transcription for instrument: %s", instrument.value)
     transcriber = create_transcriber(
         args.backend,
+        instrument=instrument,
         device=args.device,
         pti_checkpoint_path=(
             Path(args.pti_checkpoint_path).expanduser().resolve()

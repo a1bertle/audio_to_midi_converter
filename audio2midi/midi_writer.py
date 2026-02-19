@@ -6,7 +6,13 @@ from pathlib import Path
 
 from mido import Message, MetaMessage, MidiFile, MidiTrack, bpm2tempo, tick2second
 
-from audio2midi.models import NoteEvent, PedalEvent, TranscriptionResult
+from audio2midi.models import Instrument, NoteEvent, PedalEvent, TranscriptionResult
+
+# General MIDI program numbers (0-indexed).
+_INSTRUMENT_PROGRAM: dict[Instrument, int] = {
+    Instrument.PIANO: 0,     # Acoustic Grand Piano
+    Instrument.GUITAR: 25,   # Acoustic Guitar (Steel)
+}
 
 
 def _seconds_to_ticks(seconds: float, ticks_per_beat: int, tempo: int) -> int:
@@ -26,6 +32,8 @@ def write_midi_file(
     midi.tracks.append(track)
     tempo = bpm2tempo(bpm)
     track.append(MetaMessage("set_tempo", tempo=tempo, time=0))
+    program = _INSTRUMENT_PROGRAM.get(result.instrument, 0)
+    track.append(Message("program_change", program=program, time=0))
 
     events: list[tuple[int, int, Message]] = []
     for note in result.notes:

@@ -3,7 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
+
+
+class Instrument(str, Enum):
+    """Supported target instruments."""
+
+    PIANO = "piano"
+    GUITAR = "guitar"
 
 
 @dataclass(slots=True)
@@ -32,6 +40,7 @@ class TranscriptionResult:
 
     notes: list[NoteEvent] = field(default_factory=list)
     pedals: list[PedalEvent] = field(default_factory=list)
+    instrument: Instrument = Instrument.PIANO
 
 
 @dataclass(slots=True)
