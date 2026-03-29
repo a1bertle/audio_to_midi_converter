@@ -1,0 +1,4 @@
+[submodule "claude-agents"]
+	path = claude-agents
+	url = https://github.com/a1bertle/my_claude_agents.git
+	branch = audio_to_midi_converter-agents
