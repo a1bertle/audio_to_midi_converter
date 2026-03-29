@@ -1,37 +1,5 @@
 # Project Instructions
 
-## Agent framework
-
-Agent instructions live in `claude-agents/claude-agents/`. Read the relevant
-file(s) before starting the corresponding workflow. For the full framework
-overview and instructions on adding new agents, see `CLAUDE.base.md` in that
-directory.
-
-### Base workflows (read these first when applicable)
-- `base/git-workflow.md` — commit policy, message format. Read before any commit.
-- `base/research-workflow.md` — session directories, required files, sequence.
-  Read before any research or benchmarking task.
-
-### Session directories
-- `research/<date>_<topic>/` — research and benchmarking sessions (measurements, findings, data).
-- `plans/<date>_<topic>/` — implementation plans with no benchmark data (pure planning output).
-
-### Role agents (read the matching file when entering that role)
-- `agents/planner.md` — scoping and sequencing.
-- `agents/researcher.md` — benchmarking and technique evaluation.
-- `agents/implementer.md` — code changes.
-- `agents/reviewer.md` — QA and review.
-- `agents/visualizer.md` — Jupyter Notebook explainers.
-- `agents/validator.md` — test suites, evaluation scripts, golden baselines.
-- `agents/benchmarker.md` — structured benchmark entries from script runs.
-
-## Repository boundaries
-
-`claude-agents/` is a git submodule (a separate repo). Never write
-super-project implementation files inside `claude-agents/`. Those files live
-in the super-project root. The submodule contains only agent instructions,
-workflow docs, and shared tooling.
-
 # Project-specific instructions below...
 
 ## Instruction Sync
