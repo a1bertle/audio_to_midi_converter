@@ -47,3 +47,21 @@ def test_find_cached_media_hit_and_ignore_metadata(tmp_path: Path) -> None:
 def test_find_cached_media_miss(tmp_path: Path) -> None:
     downloader = YouTubeDownloader(workdir=tmp_path)
     assert downloader.find_cached_media("missing123") is None
+
+
+def test_build_ydl_options_mp3_adds_postprocessor(tmp_path: Path) -> None:
+    options = build_ydl_options(downloads_dir=tmp_path, mp3=True)
+    assert "postprocessors" in options
+    pp = options["postprocessors"][0]
+    assert pp["key"] == "FFmpegExtractAudio"
+    assert pp["preferredcodec"] == "mp3"
+
+
+def test_build_ydl_options_no_mp3_has_no_postprocessor(tmp_path: Path) -> None:
+    options = build_ydl_options(downloads_dir=tmp_path, mp3=False)
+    assert "postprocessors" not in options
+
+
+def test_youtube_downloader_mp3_flag_stored(tmp_path: Path) -> None:
+    downloader = YouTubeDownloader(workdir=tmp_path, mp3=True)
+    assert downloader.mp3 is True

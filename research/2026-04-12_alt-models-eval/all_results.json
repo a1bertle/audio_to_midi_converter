@@ -1,0 +1,284 @@
+{
+  "timings": {
+    "htdemucs_ft": {
+      "wall_s": 422.15,
+      "rss_bytes": 1525268480
+    },
+    "htdemucs_4s": {
+      "wall_s": 105.55,
+      "rss_bytes": 1525268480
+    },
+    "mdx_extra": {
+      "wall_s": 930.91,
+      "rss_bytes": 4076929024
+    },
+    "htdemucs_6s_wiener": {
+      "wall_s": 16.47,
+      "note": "post-processing only; separation reused from prior session"
+    }
+  },
+  "eval": {
+    "htdemucs_ft": {
+      "mix_path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/inputs/Foals - My Number (Official Audio).mp3",
+      "stems_dir": "/tmp/demucs_alt_eval2/htdemucs_ft/htdemucs_ft/Foals - My Number (Official Audio)",
+      "sample_rate": 44100,
+      "reconstruction": {
+        "mix_energy_db": 57.07,
+        "stem_sum_energy_db": 56.54,
+        "residual_energy_db": 37.54,
+        "leakage_ratio_db": -19.54
+      },
+      "stems": {
+        "vocals": {
+          "rms_db": -21.92,
+          "stem_to_residual_ratio_db": 10.83,
+          "spectral_centroid_hz": 2450.5,
+          "silence_fraction": 0.1902,
+          "cross_leakage_db": {
+            "drums": -18.23,
+            "bass": -19.63,
+            "other": -4.39
+          }
+        },
+        "drums": {
+          "rms_db": -17.81,
+          "stem_to_residual_ratio_db": 14.95,
+          "spectral_centroid_hz": 4920.6,
+          "silence_fraction": 0.0838,
+          "cross_leakage_db": {
+            "vocals": -18.23,
+            "bass": -6.35,
+            "other": -14.25
+          }
+        },
+        "bass": {
+          "rms_db": -21.5,
+          "stem_to_residual_ratio_db": 11.26,
+          "spectral_centroid_hz": 1832.3,
+          "silence_fraction": 0.4215,
+          "cross_leakage_db": {
+            "vocals": -19.63,
+            "drums": -6.35,
+            "other": -11.64
+          }
+        },
+        "other": {
+          "rms_db": -21.71,
+          "stem_to_residual_ratio_db": 11.04,
+          "spectral_centroid_hz": 1743.5,
+          "silence_fraction": 0.0177,
+          "cross_leakage_db": {
+            "vocals": -4.39,
+            "drums": -14.25,
+            "bass": -11.64
+          }
+        }
+      }
+    },
+    "htdemucs_4s": {
+      "mix_path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/inputs/Foals - My Number (Official Audio).mp3",
+      "stems_dir": "/tmp/demucs_alt_eval2/htdemucs_4s/htdemucs/Foals - My Number (Official Audio)",
+      "sample_rate": 44100,
+      "reconstruction": {
+        "mix_energy_db": 57.07,
+        "stem_sum_energy_db": 56.54,
+        "residual_energy_db": 35.61,
+        "leakage_ratio_db": -21.46
+      },
+      "stems": {
+        "vocals": {
+          "rms_db": -21.89,
+          "stem_to_residual_ratio_db": 12.79,
+          "spectral_centroid_hz": 2411.6,
+          "silence_fraction": 0.1809,
+          "cross_leakage_db": {
+            "drums": -17.88,
+            "bass": -19.12,
+            "other": -4.65
+          }
+        },
+        "drums": {
+          "rms_db": -17.78,
+          "stem_to_residual_ratio_db": 16.91,
+          "spectral_centroid_hz": 4848.9,
+          "silence_fraction": 0.0776,
+          "cross_leakage_db": {
+            "vocals": -17.88,
+            "bass": -6.29,
+            "other": -13.9
+          }
+        },
+        "bass": {
+          "rms_db": -21.45,
+          "stem_to_residual_ratio_db": 13.24,
+          "spectral_centroid_hz": 1873.0,
+          "silence_fraction": 0.4246,
+          "cross_leakage_db": {
+            "vocals": -19.12,
+            "drums": -6.29,
+            "other": -11.18
+          }
+        },
+        "other": {
+          "rms_db": -21.62,
+          "stem_to_residual_ratio_db": 13.06,
+          "spectral_centroid_hz": 1790.8,
+          "silence_fraction": 0.0179,
+          "cross_leakage_db": {
+            "vocals": -4.65,
+            "drums": -13.9,
+            "bass": -11.18
+          }
+        }
+      }
+    },
+    "mdx_extra": {
+      "mix_path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/inputs/Foals - My Number (Official Audio).mp3",
+      "stems_dir": "/tmp/demucs_alt_eval2/mdx_extra/mdx_extra/Foals - My Number (Official Audio)",
+      "sample_rate": 44100,
+      "reconstruction": {
+        "mix_energy_db": 57.07,
+        "stem_sum_energy_db": 56.62,
+        "residual_energy_db": 34.28,
+        "leakage_ratio_db": -22.79
+      },
+      "stems": {
+        "vocals": {
+          "rms_db": -22.01,
+          "stem_to_residual_ratio_db": 14.0,
+          "spectral_centroid_hz": 2926.4,
+          "silence_fraction": 0.1614,
+          "cross_leakage_db": {
+            "drums": -17.94,
+            "bass": -21.1,
+            "other": -4.49
+          }
+        },
+        "drums": {
+          "rms_db": -17.68,
+          "stem_to_residual_ratio_db": 18.34,
+          "spectral_centroid_hz": 4520.3,
+          "silence_fraction": 0.0856,
+          "cross_leakage_db": {
+            "vocals": -17.94,
+            "bass": -6.54,
+            "other": -14.65
+          }
+        },
+        "bass": {
+          "rms_db": -21.31,
+          "stem_to_residual_ratio_db": 14.7,
+          "spectral_centroid_hz": 2498.9,
+          "silence_fraction": 0.4032,
+          "cross_leakage_db": {
+            "vocals": -21.1,
+            "drums": -6.54,
+            "other": -12.38
+          }
+        },
+        "other": {
+          "rms_db": -21.85,
+          "stem_to_residual_ratio_db": 14.17,
+          "spectral_centroid_hz": 1720.5,
+          "silence_fraction": 0.0188,
+          "cross_leakage_db": {
+            "vocals": -4.49,
+            "drums": -14.65,
+            "bass": -12.38
+          }
+        }
+      }
+    },
+    "htdemucs_6s_wiener": {
+      "mix_path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/inputs/Foals - My Number (Official Audio).mp3",
+      "stems_dir": "/tmp/demucs_alt_eval2/htdemucs_6s_wiener",
+      "sample_rate": 44100,
+      "reconstruction": {
+        "mix_energy_db": 57.07,
+        "stem_sum_energy_db": 56.39,
+        "residual_energy_db": 38.93,
+        "leakage_ratio_db": -18.15
+      },
+      "stems": {
+        "vocals": {
+          "rms_db": -22.12,
+          "stem_to_residual_ratio_db": 9.25,
+          "spectral_centroid_hz": 2296.9,
+          "silence_fraction": 0.142,
+          "cross_leakage_db": {
+            "drums": -17.87,
+            "bass": -19.32,
+            "guitar": -4.72,
+            "other": -4.87,
+            "piano": -13.93
+          }
+        },
+        "drums": {
+          "rms_db": -17.51,
+          "stem_to_residual_ratio_db": 13.86,
+          "spectral_centroid_hz": 4707.7,
+          "silence_fraction": 0.0738,
+          "cross_leakage_db": {
+            "vocals": -17.87,
+            "bass": -6.4,
+            "guitar": -14.63,
+            "other": -20.66,
+            "piano": -22.74
+          }
+        },
+        "bass": {
+          "rms_db": -20.89,
+          "stem_to_residual_ratio_db": 10.48,
+          "spectral_centroid_hz": 1738.6,
+          "silence_fraction": 0.4092,
+          "cross_leakage_db": {
+            "vocals": -19.32,
+            "drums": -6.4,
+            "guitar": -12.04,
+            "other": -20.56,
+            "piano": -23.86
+          }
+        },
+        "guitar": {
+          "rms_db": -23.77,
+          "stem_to_residual_ratio_db": 7.59,
+          "spectral_centroid_hz": 1455.7,
+          "silence_fraction": 0.0201,
+          "cross_leakage_db": {
+            "vocals": -4.72,
+            "drums": -14.63,
+            "bass": -12.04,
+            "other": -4.61,
+            "piano": -13.12
+          }
+        },
+        "other": {
+          "rms_db": -33.8,
+          "stem_to_residual_ratio_db": -2.43,
+          "spectral_centroid_hz": 2629.4,
+          "silence_fraction": 0.4812,
+          "cross_leakage_db": {
+            "vocals": -4.87,
+            "drums": -20.66,
+            "bass": -20.56,
+            "guitar": -4.61,
+            "piano": -14.58
+          }
+        },
+        "piano": {
+          "rms_db": -69.17,
+          "stem_to_residual_ratio_db": -37.8,
+          "spectral_centroid_hz": 4051.0,
+          "silence_fraction": 0.998,
+          "cross_leakage_db": {
+            "vocals": -13.93,
+            "drums": -22.74,
+            "bass": -23.86,
+            "guitar": -13.12,
+            "other": -14.58
+          }
+        }
+      }
+    }
+  }
+}

@@ -26,3 +26,4 @@ inputs/
 
 # Logs
 .logs/
+.DS_Store

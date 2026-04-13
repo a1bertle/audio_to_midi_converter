@@ -49,9 +49,17 @@ def build_ydl_options(
     downloads_dir: Path,
     retries: int = 3,
     allow_playlist: bool = False,
+    mp3: bool = False,
 ) -> dict:
-    """Build deterministic yt-dlp options."""
-    return {
+    """Build deterministic yt-dlp options.
+
+    Args:
+        downloads_dir: Directory to save downloaded files.
+        retries: Number of download retries.
+        allow_playlist: Whether to allow playlist downloads.
+        mp3: If True, convert the downloaded audio to MP3 at best quality.
+    """
+    options: dict = {
         "format": "bestaudio/best",
         "outtmpl": str(downloads_dir / "%(id)s.%(ext)s"),
         "noplaylist": not allow_playlist,
@@ -59,6 +67,15 @@ def build_ydl_options(
         "quiet": True,
         "no_warnings": True,
     }
+    if mp3:
+        options["postprocessors"] = [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "0",  # VBR best quality
+            }
+        ]
+    return options
 
 
 class YouTubeDownloader:
@@ -69,12 +86,14 @@ class YouTubeDownloader:
         workdir: Path,
         retries: int = 3,
         allow_playlist: bool = False,
+        mp3: bool = False,
     ) -> None:
         self.workdir = Path(workdir)
         self.downloads_dir = self.workdir / "downloads"
         self.downloads_dir.mkdir(parents=True, exist_ok=True)
         self.retries = retries
         self.allow_playlist = allow_playlist
+        self.mp3 = mp3
 
     def find_cached_media(self, video_id: str) -> Path | None:
         """Find an already downloaded media file for the given video id."""
@@ -127,6 +146,7 @@ class YouTubeDownloader:
             downloads_dir=self.downloads_dir,
             retries=self.retries,
             allow_playlist=self.allow_playlist,
+            mp3=self.mp3,
         )
         try:
             with YoutubeDL(options) as ydl:
@@ -134,6 +154,8 @@ class YouTubeDownloader:
                 media_path = Path(ydl.prepare_filename(info))
         except YtDlpDownloadError as exc:
             raise DownloadError(f"Failed to download URL: {youtube_url}") from exc
+        if self.mp3:
+            media_path = media_path.with_suffix(".mp3")
         if not media_path.exists():
             raise DownloadError(
                 "yt-dlp reported success but file is missing: "
