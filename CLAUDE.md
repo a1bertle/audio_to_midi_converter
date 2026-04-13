@@ -24,6 +24,19 @@ directory.
 - `agents/visualizer.md` — Jupyter Notebook explainers.
 - `agents/validator.md` — test suites, evaluation scripts, golden baselines.
 - `agents/benchmarker.md` — structured benchmark entries from script runs.
+- `agents/project-planner.md` — research-backed proposal: orchestrates researcher, visualizer, and benchmarker to produce `proposal.md`. Use when the right approach is unknown.
+- `agents/evaluator.md` — media/data assessment: analyzes video, audio, or text inputs for measurable defects and derives a problem statement. Use before project-planner when the problem itself is undefined.
+
+## Agent Roles (Slash Commands)
+Use these commands to activate role-specific behavior:
+- `/plan` - Planning and task breakdown
+- `/research` - Benchmarking and method evaluation
+- `/implement` - Code changes with guardrails
+- `/review` - QA and review pass
+- `/visualize` - Jupyter Notebook algorithm and architecture explainers
+- `/validate` - Test suites, evaluation scripts, golden baselines, and performance benchmarks
+- `/evaluate` - Analyze a media or data input for measurable defects and derive a problem statement
+- `/propose` - Research-backed proposal: orchestrates researcher, visualizer, and benchmarker before any implementation
 
 ## Repository boundaries
 
@@ -33,6 +46,7 @@ in the super-project root. The submodule contains only agent instructions,
 workflow docs, and shared tooling.
 
 # Project-specific instructions below...
+
 
 
 ## Instruction Sync
