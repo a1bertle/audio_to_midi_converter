@@ -179,7 +179,65 @@ interest in the guitar stem. The more relevant stems for transcription are
 **vocals** and **drums**. The research framing (guitar/other bleed as primary
 success criterion) was misaligned with actual pipeline priorities.
 
-The measured data already covers vocals and drums quality across all runs — see
-the per-stem SRR and cross-leakage matrices in benchmark_results.md. A follow-on
-research session should re-evaluate model selection against vocals SRR and
-drums SRR as the primary success criteria. Session closed.
+---
+
+## Targeted Assessment: Vocals and Drums Isolation
+
+Re-analysed from existing eval JSONs — no additional separations run.
+
+### Vocals isolation
+
+| Model | Vocals SRR (dB) | Vocals/other XL (dB) | Provenance |
+|---|---|---|---|
+| htdemucs_6s (baseline) | +12.00 | −4.48 | [measured — `research/2026-04-13_demucs-quality-eval/benchmark_results.md`] |
+| htdemucs_ft | +10.83 | −4.39 | [measured — `htdemucs_ft_eval.json`] |
+| htdemucs_4s | +12.79 | −4.65 | [measured — `htdemucs_4s_eval.json`] |
+| mdx_extra | +14.00 | −4.49 | [measured — `mdx_extra_eval.json`] |
+| htdemucs_6s+wiener | +9.25 | −4.87 | [measured — `htdemucs_6s_wiener_eval.json`] |
+
+### Drums isolation
+
+| Model | Drums SRR (dB) | Drums/bass XL (dB) | Provenance |
+|---|---|---|---|
+| htdemucs_6s (baseline) | +16.61 | −6.40 | [measured — `research/2026-04-13_demucs-quality-eval/benchmark_results.md`] |
+| htdemucs_ft | +14.95 | −6.35 | [measured — `htdemucs_ft_eval.json`] |
+| htdemucs_4s | +16.91 | −6.29 | [measured — `htdemucs_4s_eval.json`] |
+| mdx_extra | +18.34 | −6.54 | [measured — `mdx_extra_eval.json`] |
+| htdemucs_6s+wiener | +13.86 | −6.40 | [measured — `htdemucs_6s_wiener_eval.json`] |
+
+### Findings
+
+**Finding V1 — vocals/other cross-leakage is structural (~−4.5 dB) across all models**
+[measured — all runs: range −4.39 to −4.87 dB]
+No tested model improves this. It is an inherent property of the "other" category
+absorbing vocal residuals, not a model-specific deficiency.
+
+**Finding V2 — htdemucs_4s is the best within-budget model for vocals**
+[measured — htdemucs_4s_eval.json: vocals SRR +12.79 dB, RTF 0.44×]
+Beats the current 6s baseline (+12.00 dB) by 0.79 dB with lower RTF.
+mdx_extra is better (+14.00 dB) but CPU-only at 3.84× RTF — outside budget.
+
+**Finding D1 — drums/bass cross-leakage is structural (~−6.4 dB) across all models**
+[measured — all runs: range −6.29 to −6.54 dB]
+Same pattern as vocals/other: not model-dependent.
+
+**Finding D2 — htdemucs_4s matches the 6s baseline for drums within budget**
+[measured — htdemucs_4s_eval.json: drums SRR +16.91 dB vs baseline +16.61 dB]
+Marginal improvement (+0.30 dB). mdx_extra leads (+18.34 dB) but is over budget.
+
+**Finding D3 — htdemucs_6s+wiener degrades vocals and drums**
+[measured — htdemucs_6s_wiener_eval.json: vocals SRR +9.25 dB, drums SRR +13.86 dB]
+Wiener masking on the guitar/other pair corrupts the shared residual used for all
+SRR calculations, dragging down every stem's score.
+
+### Conclusion — vocals and drums
+
+`htdemucs_4s` (stock 4-stem, MPS) is the recommended model for vocals and drums
+transcription:
+- Vocals SRR +12.79 dB (+0.79 dB over baseline), RTF 0.44× [measured]
+- Drums SRR +16.91 dB (+0.30 dB over baseline), RTF 0.44× [measured]
+- No guitar/piano stem (not needed for vocals/drums transcription)
+- Fastest of all tested models on MPS
+
+The 6s model offers no advantage for vocals or drums and introduces unnecessary
+guitar/piano separation complexity. Session closed.

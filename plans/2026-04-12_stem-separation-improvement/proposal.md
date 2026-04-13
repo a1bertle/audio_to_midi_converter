@@ -156,9 +156,31 @@ The measured data covers vocals and drums SRR and cross-leakage across all runs
 and is available in `research/2026-04-12_alt-models-eval/benchmark_results.md`
 for a follow-on analysis. The guitar/other success criteria are retired.
 
+## Vocals and Drums Re-analysis
+
+Re-analysed from existing eval JSONs (no additional separations). Full tables
+in `research/2026-04-12_alt-models-eval/notes.md`.
+
+| Model | Vocals SRR (dB) | Drums SRR (dB) | RTF |
+|---|---|---|---|
+| htdemucs_6s (baseline) | +12.00 [measured] | +16.61 [measured] | 0.52× [measured] |
+| htdemucs_ft | +10.83 [measured] | +14.95 [measured] | 1.74× [measured] |
+| **htdemucs_4s** | **+12.79** [measured] | **+16.91** [measured] | **0.44×** [measured] |
+| mdx_extra | +14.00 [measured] | +18.34 [measured] | 3.84× [measured] ‡ |
+| htdemucs_6s+wiener | +9.25 [measured] | +13.86 [measured] | ~0.59× [measured] |
+
+‡ Exceeds ≤3× real-time budget.
+
+## Recommendation
+
+**htdemucs_4s** — stock 4-stem model, MPS device.
+
+Best within-budget model for both vocals (+12.79 dB SRR) and drums (+16.91 dB SRR).
+Faster than the current 6s baseline (RTF 0.44× vs 0.52×). The 6s model offers
+no advantage for vocals or drums transcription.
+
 ## Next Step
 
-Invoke a new **project-planner** session with: "Evaluate stem separation model
-selection targeting vocals SRR > +15 dB and drums SRR > +18 dB on the Foals
-benchmark track, using data already collected in
-`research/2026-04-12_alt-models-eval/benchmark_results.md`."
+Invoke **planner** with: "Replace htdemucs_6s with htdemucs (4-stem) as the
+default separation model in the stem splitter pipeline, targeting vocals and
+drums transcription. Expose --model flag to allow override."
