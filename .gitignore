@@ -21,3 +21,8 @@ dist/
 
 # Local outputs
 *.mid
+output/
+inputs/
+
+# Logs
+.logs/
