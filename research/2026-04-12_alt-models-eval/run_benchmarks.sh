@@ -10,7 +10,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 INPUT="$REPO_ROOT/inputs/Foals - My Number (Official Audio).mp3"
 EVAL_SCRIPT="$REPO_ROOT/tests/evaluation/evaluate_stems.py"
-OUT_ROOT="/tmp/demucs_alt_eval"
+OUT_ROOT="$REPO_ROOT/output/2026-04-12_alt-models-eval"
 SESSION_DIR="$REPO_ROOT/research/2026-04-12_alt-models-eval"
 
 # SSL fix (same as prior benchmark session)
