@@ -39,6 +39,7 @@ def create_transcriber(
     rmvpe_checkpoint_path: Path | None = None,
     bpm_detect_bin: Path | None = None,
     bpm_override: float | None = None,
+    click_track_path: Path | None = None,
 ) -> BaseTranscriber:
     """Create a transcriber backend by name."""
     normalized = (backend or _DEFAULT_BACKEND[instrument]).strip().lower()
@@ -71,6 +72,7 @@ def create_transcriber(
             bpm_detect_bin=bpm_detect_bin,
             device=device,
             bpm_override=bpm_override,
+            click_track_path=click_track_path,
         )
     raise InvalidInputError(
         f"Unsupported backend '{backend}'."

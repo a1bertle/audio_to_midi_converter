@@ -27,3 +27,6 @@ inputs/
 # Logs
 .logs/
 .DS_Store
+
+# Local user settings (machine-specific paths, not for commit)
+user.settings.json

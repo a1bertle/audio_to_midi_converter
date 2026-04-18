@@ -63,8 +63,19 @@ def _ensure_checkpoint(checkpoint_path: Path) -> Path:
     return Path(downloaded)
 
 
-def _detect_bpm(audio_path: Path, bpm_detect_bin: Path | None) -> float | None:
-    """Run bpm_detect binary and return detected BPM, or None if unavailable."""
+def _detect_bpm(
+    audio_path: Path,
+    bpm_detect_bin: Path | None,
+    click_track_path: Path | None = None,
+) -> float | None:
+    """Run bpm_detect binary and return detected BPM, or None if unavailable.
+
+    bpm_detect does not support WAV input; if the provided file is a WAV it is
+    transcoded to a temporary MP3 via ffmpeg before being passed to bpm_detect.
+
+    If click_track_path is given, bpm_detect writes a click-track WAV overlay
+    to that path; otherwise the click output is discarded.
+    """
     binary = bpm_detect_bin or shutil.which("bpm_detect")
     if binary is None:
         LOGGER.warning(
@@ -72,9 +83,31 @@ def _detect_bpm(audio_path: Path, bpm_detect_bin: Path | None) -> float | None:
             "Pass bpm_detect_bin or put bpm_detect on PATH for accurate tempo."
         )
         return None
+
+    input_path = audio_path
+    _tmp_mp3: "tempfile.NamedTemporaryFile | None" = None  # noqa: F821
+
+    if audio_path.suffix.lower() == ".wav":
+        import tempfile
+        _tmp_mp3 = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+        _tmp_mp3.close()
+        try:
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(audio_path), "-q:a", "2",
+                 _tmp_mp3.name],
+                capture_output=True,
+                check=True,
+                timeout=120,
+            )
+            input_path = Path(_tmp_mp3.name)
+        except Exception as exc:
+            LOGGER.warning("ffmpeg WAV→MP3 conversion failed: %s; using WAV directly", exc)
+            input_path = audio_path
+
+    click_out = str(click_track_path) if click_track_path is not None else "/dev/null"
     try:
         result = subprocess.run(
-            [str(binary), "-v", str(audio_path), "-o", "/dev/null"],
+            [str(binary), "-v", str(input_path), "-o", click_out],
             capture_output=True,
             text=True,
             timeout=120,
@@ -86,6 +119,9 @@ def _detect_bpm(audio_path: Path, bpm_detect_bin: Path | None) -> float | None:
                 return bpm
     except Exception as exc:
         LOGGER.warning("bpm_detect failed: %s", exc)
+    finally:
+        if _tmp_mp3 is not None:
+            Path(_tmp_mp3.name).unlink(missing_ok=True)
     return None
 
 
@@ -247,6 +283,7 @@ class RmvpeTranscriber(BaseTranscriber):
         bpm_detect_bin: Path | None = None,
         device: str = "cpu",
         bpm_override: float | None = None,
+        click_track_path: Path | None = None,
     ) -> None:
         self._checkpoint_path = Path(
             checkpoint_path or _DEFAULT_CHECKPOINT_DIR / _CHECKPOINT_FILENAME
@@ -254,6 +291,7 @@ class RmvpeTranscriber(BaseTranscriber):
         self._bpm_detect_bin = Path(bpm_detect_bin) if bpm_detect_bin else None
         self._device = device
         self._bpm_override = bpm_override
+        self._click_track_path = Path(click_track_path) if click_track_path else None
         self._model = None  # lazy load
 
     def _get_model(self):
@@ -275,7 +313,9 @@ class RmvpeTranscriber(BaseTranscriber):
                 bpm = self._bpm_override
                 LOGGER.info("Using BPM override: %.2f", bpm)
             else:
-                bpm = _detect_bpm(wav_path, self._bpm_detect_bin) or 120.0
+                bpm = _detect_bpm(
+                    wav_path, self._bpm_detect_bin, self._click_track_path
+                ) or 120.0
 
             # 3. Pitch tracking
             LOGGER.info("Running RMVPE pitch tracker...")

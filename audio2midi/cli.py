@@ -3,10 +3,22 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import re
 import sys
 from pathlib import Path
+
+_USER_SETTINGS_PATH = Path(__file__).resolve().parents[1] / "user.settings.json"
+
+
+def _load_user_settings() -> dict:
+    if _USER_SETTINGS_PATH.exists():
+        try:
+            return json.loads(_USER_SETTINGS_PATH.read_text())
+        except Exception:
+            pass
+    return {}
 
 from audio2midi.downloader import YouTubeDownloader
 from audio2midi.exceptions import Audio2MidiError
@@ -76,6 +88,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Override BPM for vocals transcription instead of auto-detecting.",
     )
     parser.add_argument(
+        "--click-track",
+        default=None,
+        help=(
+            "Path to write a click-track WAV overlay (vocals only). "
+            "Requires --bpm-detect-bin. Output is the original audio mixed with "
+            "a metronome click at the detected tempo."
+        ),
+    )
+    parser.add_argument(
         "--device",
         default="cpu",
         help="Backend device setting, e.g. cpu or cuda.",
@@ -127,6 +148,11 @@ def _sanitize_filename(title: str) -> str:
 
 def run_pipeline(args: argparse.Namespace) -> Path:
     """Run the end-to-end audio2midi pipeline."""
+    user_settings = _load_user_settings()
+
+    if args.bpm_detect_bin is None and "bpm_detect_bin" in user_settings:
+        args.bpm_detect_bin = user_settings["bpm_detect_bin"]
+
     workdir = Path(args.workdir).expanduser().resolve()
     extracted_dir = workdir / "extracted"
     preprocessed_dir = workdir / "preprocessed"
@@ -173,8 +199,20 @@ def run_pipeline(args: argparse.Namespace) -> Path:
             else None
         ),
         bpm_override=args.bpm_override,
+        click_track_path=(
+            Path(args.click_track).expanduser().resolve()
+            if args.click_track
+            else None
+        ),
     )
     transcription = transcriber.transcribe(processed_wav_path)
+
+    if args.click_track:
+        click_path = Path(args.click_track).expanduser().resolve()
+        if click_path.exists():
+            LOGGER.info("Click track written: %s", click_path)
+        else:
+            LOGGER.warning("Click track was requested but not produced at %s", click_path)
 
     LOGGER.info("Post-processing events...")
     cleaned = postprocess_transcription(
