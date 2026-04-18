@@ -21,6 +21,14 @@ dist/
 
 # Local outputs
 *.mid
+*.wav
+*.mp3
+*.mp4
+*.m4a
+*.webm
+*.flac
+*.ogg
+*.aac
 output/
 inputs/
 
@@ -31,7 +39,6 @@ inputs/
 # Local user settings (machine-specific paths, not for commit)
 user.settings.json
 
-# Research session audio/stem files (large binaries, reproducible)
-research/**/*.wav
+# Research session stem directories (large binaries, reproducible)
 research/**/stems/
 notebooks/**/*-checkpoint.ipynb
