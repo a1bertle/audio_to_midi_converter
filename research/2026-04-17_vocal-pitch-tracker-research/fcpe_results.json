@@ -1,0 +1,13 @@
+{
+  "tool": "fcpe",
+  "input": "output/2026-04-13_escene-htdemucs-4s-wav/E.scene \uff02\u610f\u8b58\uff02 Music Video/vocals.wav",
+  "duration_s": 245.59,
+  "elapsed_s": 3.12,
+  "rtf": 0.0127,
+  "voiced_frames": 13736,
+  "total_frames": 24559,
+  "voiced_fraction": 0.5593,
+  "midi_notes": 484,
+  "notes_per_second": 1.971,
+  "device": "cpu"
+}

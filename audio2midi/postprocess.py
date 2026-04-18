@@ -59,4 +59,9 @@ def postprocess_transcription(
         if end <= start:
             end = start + min_duration_seconds
         cleaned_notes.append(replace(note, start=start, end=end))
-    return TranscriptionResult(notes=cleaned_notes, pedals=pedals)
+    return TranscriptionResult(
+        notes=cleaned_notes,
+        pedals=pedals,
+        instrument=result.instrument,
+        bpm=result.bpm,
+    )

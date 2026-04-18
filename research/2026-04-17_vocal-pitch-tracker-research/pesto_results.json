@@ -1,0 +1,13 @@
+{
+  "tool": "pesto",
+  "input": "output/2026-04-13_escene-htdemucs-4s-wav/E.scene \uff02\u610f\u8b58\uff02 Music Video/vocals.wav",
+  "duration_s": 245.59,
+  "elapsed_s": 24.39,
+  "rtf": 0.0993,
+  "voiced_frames": 11202,
+  "total_frames": 24563,
+  "voiced_fraction": 0.4561,
+  "mean_confidence": 0.9848,
+  "midi_notes": 265,
+  "notes_per_second": 1.079
+}

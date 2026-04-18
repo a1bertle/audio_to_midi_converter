@@ -12,12 +12,14 @@ from audio2midi.models import Instrument, TranscriptionResult
 _VALID_BACKENDS: dict[Instrument, set[str]] = {
     Instrument.PIANO: {"pti", "piano-transcription-inference", "basic-pitch", "basic_pitch"},
     Instrument.GUITAR: {"basic-pitch", "basic_pitch"},
+    Instrument.VOCALS: {"rmvpe"},
 }
 
 # Default backend when none is specified.
 _DEFAULT_BACKEND: dict[Instrument, str] = {
     Instrument.PIANO: "pti",
     Instrument.GUITAR: "basic-pitch",
+    Instrument.VOCALS: "rmvpe",
 }
 
 
@@ -34,6 +36,9 @@ def create_transcriber(
     instrument: Instrument = Instrument.PIANO,
     device: str = "cpu",
     pti_checkpoint_path: Path | None = None,
+    rmvpe_checkpoint_path: Path | None = None,
+    bpm_detect_bin: Path | None = None,
+    bpm_override: float | None = None,
 ) -> BaseTranscriber:
     """Create a transcriber backend by name."""
     normalized = (backend or _DEFAULT_BACKEND[instrument]).strip().lower()
@@ -58,6 +63,15 @@ def create_transcriber(
         from audio2midi.transcribers.basic_pitch import BasicPitchTranscriber
 
         return BasicPitchTranscriber(instrument=instrument)
+    if normalized == "rmvpe":
+        from audio2midi.transcribers.rmvpe import RmvpeTranscriber
+
+        return RmvpeTranscriber(
+            checkpoint_path=rmvpe_checkpoint_path,
+            bpm_detect_bin=bpm_detect_bin,
+            device=device,
+            bpm_override=bpm_override,
+        )
     raise InvalidInputError(
         f"Unsupported backend '{backend}'."
     )

@@ -55,14 +55,25 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--instrument",
         default="piano",
-        choices=["piano", "guitar"],
-        help="Target instrument (default: piano). Guitar uses basic-pitch with tuned parameters.",
+        choices=["piano", "guitar", "vocals"],
+        help="Target instrument (default: piano). Guitar uses basic-pitch; vocals uses rmvpe.",
     )
     parser.add_argument(
         "--backend",
         default=None,
-        choices=["pti", "piano-transcription-inference", "basic-pitch"],
-        help="Transcription backend. Default depends on instrument (pti for piano, basic-pitch for guitar).",
+        choices=["pti", "piano-transcription-inference", "basic-pitch", "rmvpe"],
+        help="Transcription backend. Default depends on instrument.",
+    )
+    parser.add_argument(
+        "--bpm-detect-bin",
+        default=None,
+        help="Path to bpm_detect binary (vocals only). Falls back to PATH lookup, then 120 BPM.",
+    )
+    parser.add_argument(
+        "--bpm-override",
+        type=float,
+        default=None,
+        help="Override BPM for vocals transcription instead of auto-detecting.",
     )
     parser.add_argument(
         "--device",
@@ -156,6 +167,12 @@ def run_pipeline(args: argparse.Namespace) -> Path:
             if args.pti_checkpoint_path
             else None
         ),
+        bpm_detect_bin=(
+            Path(args.bpm_detect_bin).expanduser().resolve()
+            if args.bpm_detect_bin
+            else None
+        ),
+        bpm_override=args.bpm_override,
     )
     transcription = transcriber.transcribe(processed_wav_path)
 
@@ -168,7 +185,7 @@ def run_pipeline(args: argparse.Namespace) -> Path:
     )
 
     LOGGER.info("Writing MIDI output...")
-    write_midi_file(cleaned, output_path)
+    write_midi_file(cleaned, output_path, bpm=cleaned.bpm or 120.0)
 
     if not args.keep_intermediate:
         raw_wav_path.unlink(missing_ok=True)

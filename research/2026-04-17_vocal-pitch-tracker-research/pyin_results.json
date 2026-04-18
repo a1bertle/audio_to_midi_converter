@@ -1,0 +1,12 @@
+{
+  "tool": "pyin",
+  "input": "output/2026-04-13_escene-htdemucs-4s-wav/E.scene \uff02\u610f\u8b58\uff02 Music Video/vocals.wav",
+  "duration_s": 245.59,
+  "elapsed_s": 61.24,
+  "rtf": 0.2494,
+  "voiced_frames": 12146,
+  "total_frames": 21154,
+  "voiced_fraction": 0.5742,
+  "midi_notes": 556,
+  "notes_per_second": 2.264
+}

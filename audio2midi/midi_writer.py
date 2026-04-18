@@ -12,6 +12,7 @@ from audio2midi.models import Instrument, NoteEvent, PedalEvent, TranscriptionRe
 _INSTRUMENT_PROGRAM: dict[Instrument, int] = {
     Instrument.PIANO: 0,     # Acoustic Grand Piano
     Instrument.GUITAR: 25,   # Acoustic Guitar (Steel)
+    Instrument.VOCALS: 53,   # Voice Oohs
 }
 
 

@@ -12,6 +12,7 @@ class Instrument(str, Enum):
 
     PIANO = "piano"
     GUITAR = "guitar"
+    VOCALS = "vocals"
 
 
 @dataclass(slots=True)
@@ -41,6 +42,7 @@ class TranscriptionResult:
     notes: list[NoteEvent] = field(default_factory=list)
     pedals: list[PedalEvent] = field(default_factory=list)
     instrument: Instrument = Instrument.PIANO
+    bpm: float | None = None
 
 
 @dataclass(slots=True)
