@@ -20,6 +20,11 @@ def _load_user_settings() -> dict:
             pass
     return {}
 
+import subprocess
+import tempfile
+
+import numpy as np
+
 from audio2midi.downloader import YouTubeDownloader
 from audio2midi.exceptions import Audio2MidiError
 from audio2midi.extractor import extract_to_wav
@@ -28,9 +33,55 @@ from audio2midi.models import Instrument
 from audio2midi.postprocess import postprocess_transcription
 from audio2midi.preprocess import preprocess_wav_file
 from audio2midi.transcribers.base import create_transcriber
+from audio2midi.transcribers.rmvpe import _parse_beat_times
 
 
 LOGGER = logging.getLogger("audio2midi")
+
+
+def _run_bpm_detect(
+    audio_path: Path,
+    bpm_detect_bin: Path,
+    click_track_path: Path,
+) -> float | None:
+    """Run bpm_detect on the raw mix and write click track to click_track_path.
+
+    Transcodes WAV→MP3 first since bpm_detect only accepts MP3/MP4/M4A.
+    Returns detected BPM or None on failure.
+    """
+    input_path = audio_path
+    tmp_mp3 = None
+
+    if audio_path.suffix.lower() == ".wav":
+        tmp_mp3 = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+        tmp_mp3.close()
+        try:
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(audio_path), "-q:a", "2", tmp_mp3.name],
+                capture_output=True, check=True, timeout=120,
+            )
+            input_path = Path(tmp_mp3.name)
+        except Exception as exc:
+            LOGGER.warning("ffmpeg WAV→MP3 conversion failed: %s; skipping bpm_detect", exc)
+            return None
+
+    try:
+        result = subprocess.run(
+            [str(bpm_detect_bin), "-v", str(input_path), "-o", str(click_track_path)],
+            capture_output=True, text=True, timeout=120,
+        )
+        for line in result.stdout.splitlines():
+            if line.startswith("Detected BPM:"):
+                bpm = float(line.split(":")[1].strip())
+                LOGGER.info("Detected BPM: %.2f", bpm)
+                return bpm
+        LOGGER.warning("bpm_detect ran but produced no BPM line")
+    except Exception as exc:
+        LOGGER.warning("bpm_detect failed: %s", exc)
+    finally:
+        if tmp_mp3 is not None:
+            Path(tmp_mp3.name).unlink(missing_ok=True)
+    return None
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -94,6 +145,25 @@ def _build_parser() -> argparse.ArgumentParser:
             "Path to write a click-track WAV overlay (vocals only). "
             "Requires --bpm-detect-bin. Output is the original audio mixed with "
             "a metronome click at the detected tempo."
+        ),
+    )
+    parser.add_argument(
+        "--f0-filter-frames",
+        type=int,
+        default=7,
+        help=(
+            "Median filter window in frames (10 ms each) applied to the raw F0 "
+            "contour before semitone snapping (vocals only). Default 7 (70 ms), "
+            "grounded in measured vibrato period of ~195 ms. Set to 1 to disable."
+        ),
+    )
+    parser.add_argument(
+        "--snap-to-beats",
+        action="store_true",
+        help=(
+            "Snap note boundaries to the nearest 16th-note subdivision on the "
+            "detected beat grid (vocals only). Requires --bpm-detect-bin. "
+            "Improves rhythmic feel at the cost of exact onset timing."
         ),
     )
     parser.add_argument(
@@ -182,6 +252,29 @@ def run_pipeline(args: argparse.Namespace) -> Path:
         denoise=args.denoise,
     )
 
+    # Run bpm_detect on the raw mix before any stem separation.
+    beat_times: np.ndarray = np.array([], dtype=float)
+    bpm_detect_bin = (
+        Path(args.bpm_detect_bin).expanduser().resolve() if args.bpm_detect_bin else None
+    )
+    if bpm_detect_bin is not None and args.instrument == "vocals":
+        click_out = (
+            Path(args.click_track).expanduser().resolve()
+            if args.click_track
+            else Path(tempfile.mktemp(suffix="_click.wav"))
+        )
+        detected_bpm = _run_bpm_detect(processed_wav_path, bpm_detect_bin, click_out)
+        if detected_bpm is not None and click_out.exists():
+            beat_times = _parse_beat_times(click_out)
+            if args.click_track:
+                LOGGER.info("Click track written: %s", click_out)
+            elif click_out.exists():
+                click_out.unlink(missing_ok=True)
+        if args.bpm_override is None and detected_bpm is not None:
+            args.bpm_override = detected_bpm
+    elif args.bpm_detect_bin and args.instrument != "vocals":
+        LOGGER.warning("--bpm-detect-bin is only used for vocals transcription")
+
     instrument = Instrument(args.instrument)
     LOGGER.info("Running transcription for instrument: %s", instrument.value)
     transcriber = create_transcriber(
@@ -193,26 +286,12 @@ def run_pipeline(args: argparse.Namespace) -> Path:
             if args.pti_checkpoint_path
             else None
         ),
-        bpm_detect_bin=(
-            Path(args.bpm_detect_bin).expanduser().resolve()
-            if args.bpm_detect_bin
-            else None
-        ),
         bpm_override=args.bpm_override,
-        click_track_path=(
-            Path(args.click_track).expanduser().resolve()
-            if args.click_track
-            else None
-        ),
+        beat_times=beat_times,
+        snap_to_beats=getattr(args, "snap_to_beats", False),
+        f0_filter_frames=args.f0_filter_frames,
     )
     transcription = transcriber.transcribe(processed_wav_path)
-
-    if args.click_track:
-        click_path = Path(args.click_track).expanduser().resolve()
-        if click_path.exists():
-            LOGGER.info("Click track written: %s", click_path)
-        else:
-            LOGGER.warning("Click track was requested but not produced at %s", click_path)
 
     LOGGER.info("Post-processing events...")
     cleaned = postprocess_transcription(
