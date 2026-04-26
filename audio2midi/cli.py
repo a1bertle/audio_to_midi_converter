@@ -88,9 +88,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="audio2midi",
         description=(
-            "Convert YouTube audio performances into MIDI files. "
-            "Supports piano (default) and guitar instruments. "
-            "Runs completely on-device after download."
+            "Transcribe vocal performances from YouTube into MIDI using RMVPE pitch tracking. "
+            "Also supports piano and guitar. Runs completely on-device after download."
         ),
     )
     parser.add_argument("--youtube-url", required=True, help="YouTube video URL.")
@@ -101,13 +100,17 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--workdir",
-        default=".cache/audio2midi",
-        help="Working directory for downloads and intermediates.",
+        default=None,
+        help=(
+            "Working directory for downloads and intermediates. "
+            "Defaults to <project_root>/outputs/<video_name>/."
+        ),
     )
     parser.add_argument(
         "--keep-intermediate",
         action="store_true",
-        help="Keep extracted and preprocessed WAV files.",
+        default=True,
+        help="Keep extracted and preprocessed WAV files (default: True).",
     )
     parser.add_argument(
         "--allow-playlist",
@@ -117,9 +120,9 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--retries", type=int, default=3, help="Download retry count.")
     parser.add_argument(
         "--instrument",
-        default="piano",
+        default="vocals",
         choices=["piano", "guitar", "vocals"],
-        help="Target instrument (default: piano). Guitar uses basic-pitch; vocals uses rmvpe.",
+        help="Target instrument (default: vocals). Guitar uses basic-pitch; vocals uses rmvpe.",
     )
     parser.add_argument(
         "--backend",
@@ -223,22 +226,57 @@ def run_pipeline(args: argparse.Namespace) -> Path:
     if args.bpm_detect_bin is None and "bpm_detect_bin" in user_settings:
         args.bpm_detect_bin = user_settings["bpm_detect_bin"]
 
-    workdir = Path(args.workdir).expanduser().resolve()
-    extracted_dir = workdir / "extracted"
-    preprocessed_dir = workdir / "preprocessed"
+    _project_root = Path(__file__).resolve().parents[1]
 
+    # Use a temporary workdir for the initial download so we can derive the video name.
+    tmp_workdir = (
+        Path(args.workdir).expanduser().resolve()
+        if args.workdir
+        else _project_root / ".cache" / "audio2midi_tmp"
+    )
     downloader = YouTubeDownloader(
-        workdir=workdir,
+        workdir=tmp_workdir,
         retries=args.retries,
         allow_playlist=args.allow_playlist,
     )
     download_result = downloader.download(args.youtube_url)
 
+    video_name = _sanitize_filename(download_result.title or download_result.video_id)
+
+    if args.workdir:
+        workdir = Path(args.workdir).expanduser().resolve()
+    else:
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        workdir = _project_root / "outputs" / f"{timestamp}_{video_name}"
+
+    workdir.mkdir(parents=True, exist_ok=True)
+    extracted_dir = workdir / "extracted"
+    preprocessed_dir = workdir / "preprocessed"
+
+    # Move downloaded files into the final workdir if they came from the tmp location.
+    if not args.workdir and not download_result.media_path.is_relative_to(workdir):
+        import shutil
+        from audio2midi.models import DownloadResult as _DR
+        tmp_downloads = tmp_workdir / "downloads"
+        dst_downloads = workdir / "downloads"
+        if tmp_downloads.exists():
+            shutil.copytree(str(tmp_downloads), str(dst_downloads), dirs_exist_ok=True)
+            shutil.rmtree(str(tmp_downloads), ignore_errors=True)
+        dest = dst_downloads / download_result.media_path.name
+        download_result = _DR(
+            video_id=download_result.video_id,
+            title=download_result.title,
+            media_path=dest,
+            webpage_url=download_result.webpage_url,
+            duration_seconds=download_result.duration_seconds,
+        )
+
     if args.output:
         output_path = Path(args.output).expanduser().resolve()
     else:
-        filename = _sanitize_filename(download_result.title or download_result.video_id)
-        output_path = Path(f"{filename}.mid").resolve()
+        output_path = workdir / f"{video_name}.mid"
+
     raw_wav_path = extracted_dir / f"{download_result.video_id}.wav"
     processed_wav_path = preprocessed_dir / f"{download_result.video_id}.wav"
 
@@ -277,6 +315,7 @@ def run_pipeline(args: argparse.Namespace) -> Path:
 
     instrument = Instrument(args.instrument)
     LOGGER.info("Running transcription for instrument: %s", instrument.value)
+    stems_dir = workdir / "stems"
     transcriber = create_transcriber(
         args.backend,
         instrument=instrument,
@@ -290,6 +329,7 @@ def run_pipeline(args: argparse.Namespace) -> Path:
         beat_times=beat_times,
         snap_to_beats=getattr(args, "snap_to_beats", False),
         f0_filter_frames=args.f0_filter_frames,
+        stems_dir=stems_dir,
     )
     transcription = transcriber.transcribe(processed_wav_path)
 

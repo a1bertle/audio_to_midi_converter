@@ -425,6 +425,7 @@ class RmvpeTranscriber(BaseTranscriber):
         beat_times: np.ndarray | None = None,
         snap_to_beats: bool = False,
         f0_filter_frames: int = 7,
+        stems_dir: Path | None = None,
     ) -> None:
         self._checkpoint_path = Path(
             checkpoint_path or _DEFAULT_CHECKPOINT_DIR / _CHECKPOINT_FILENAME
@@ -434,6 +435,7 @@ class RmvpeTranscriber(BaseTranscriber):
         self._beat_times = beat_times if beat_times is not None else np.array([], dtype=float)
         self._snap_to_beats = snap_to_beats
         self._f0_filter_frames = f0_filter_frames
+        self._stems_dir = stems_dir
         self._model = None  # lazy load
 
     def _get_model(self):
@@ -461,9 +463,10 @@ class RmvpeTranscriber(BaseTranscriber):
 
         with tempfile.TemporaryDirectory(prefix="audio2midi_vocals_") as tmp:
             tmp_path = Path(tmp)
+            stems_out = self._stems_dir if self._stems_dir is not None else tmp_path / "stems"
 
             # 1. Stem separation — runs on raw mix, unaffected by click track
-            vocals_path = _separate_vocals(wav_path, tmp_path / "stems")
+            vocals_path = _separate_vocals(wav_path, stems_out)
 
             # 2. Pitch tracking
             LOGGER.info("Running RMVPE pitch tracker...")

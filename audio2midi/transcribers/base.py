@@ -41,6 +41,7 @@ def create_transcriber(
     beat_times=None,
     snap_to_beats: bool = False,
     f0_filter_frames: int = 7,
+    stems_dir: Path | None = None,
 ) -> BaseTranscriber:
     """Create a transcriber backend by name."""
     normalized = (backend or _DEFAULT_BACKEND[instrument]).strip().lower()
@@ -75,6 +76,7 @@ def create_transcriber(
             beat_times=beat_times,
             snap_to_beats=snap_to_beats,
             f0_filter_frames=f0_filter_frames,
+            stems_dir=stems_dir,
         )
     raise InvalidInputError(
         f"Unsupported backend '{backend}'."
