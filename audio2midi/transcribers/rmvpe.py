@@ -219,6 +219,50 @@ def _merge_same_pitch(
     return raw
 
 
+def _gap_fill(
+    raw: list[tuple[float, float, int]],
+    f0_hz: np.ndarray,
+    max_gap_s: float,
+) -> list[tuple[float, float, int]]:
+    """Extend note end times into short same-pitch voiced gaps.
+
+    For each consecutive pair of same-pitch notes whose gap is > 0 and
+    <= max_gap_s, checks whether any F0 frame inside that gap is voiced at
+    the same semitone.  If so, merges the two notes into one (extending the
+    first note's end to the second note's end).
+
+    Operates on the already median-filtered f0_hz array.  Runs a single
+    forward pass — merges are monotonic so no iteration is required.
+    """
+    if not raw:
+        return raw
+    lo = librosa.note_to_hz("C2")
+    hi = librosa.note_to_hz("C6")
+    out: list[tuple[float, float, int]] = []
+    i = 0
+    while i < len(raw):
+        if i + 1 < len(raw):
+            s0, e0, n0 = raw[i]
+            s1, e1, n1 = raw[i + 1]
+            gap = s1 - e0
+            if n0 == n1 and 0 < gap <= max_gap_s:
+                gap_start_frame = int(round(e0 / _HOP_S))
+                gap_end_frame = int(round(s1 / _HOP_S))
+                gap_f0 = f0_hz[gap_start_frame:gap_end_frame]
+                voiced_gap = gap_f0[(gap_f0 > 0) & (gap_f0 >= lo) & (gap_f0 <= hi)]
+                if len(voiced_gap) > 0:
+                    snap = np.round(
+                        12 * np.log2(np.maximum(voiced_gap, 1e-6) / 440.0) + 69
+                    ).astype(int)
+                    if np.any(snap == n0):
+                        out.append((s0, e1, n0))
+                        i += 2
+                        continue
+        out.append(raw[i])
+        i += 1
+    return out
+
+
 def _nearest_beat_distance(t: float, beat_times: np.ndarray) -> float:
     """Return seconds to the nearest beat in beat_times, or inf if empty."""
     if len(beat_times) == 0:
@@ -334,16 +378,16 @@ def _pitch_track_to_notes(
             i += 1
         raw = out
 
-    # Same-pitch merge (pass 1): collapse same-pitch fragments up to one 8th
-    # note gap, preserving beat-boundary separations.
-    eighth_s = (60.0 / bpm) / 2.0
+    # Same-pitch merge (pass 1): collapse same-pitch fragments up to one
+    # quarter-note gap, preserving beat-boundary separations.
+    quarter_s = 60.0 / bpm
     beat_arr_pre = np.sort(beat_times) if beat_times is not None and len(beat_times) > 0 \
         else np.array([], dtype=float)
     pre_beat_tol = (
         float(np.median(np.diff(beat_arr_pre))) * 0.25
         if beat_arr_pre.size > 0 else 0.0
     )
-    raw = _merge_same_pitch(raw, eighth_s, beat_arr_pre, pre_beat_tol)
+    raw = _merge_same_pitch(raw, quarter_s, beat_arr_pre, pre_beat_tol)
 
     # Onset-based syllable splitting — beat-gated when beat_times provided.
     # A split is only allowed when the onset aligns to a beat (within 25% of
@@ -388,7 +432,12 @@ def _pitch_track_to_notes(
 
     # Same-pitch merge (pass 2): the onset split may have re-cut merged notes;
     # clean up any same-pitch adjacencies it reintroduced.
-    raw = _merge_same_pitch(raw, eighth_s, beat_arr_pre, pre_beat_tol)
+    raw = _merge_same_pitch(raw, quarter_s, beat_arr_pre, pre_beat_tol)
+
+    # F0-guided gap-fill: extend notes into short same-pitch voiced gaps that
+    # the merge passes missed (e.g. vibrato troughs, soft consonants below the
+    # voicing threshold).  Uses the already median-filtered f0_hz array.
+    raw = _gap_fill(raw, f0_hz, quarter_s)
 
     # Snap note boundaries to nearest 16th-note subdivision on the beat grid.
     if snap_to_beats and beat_arr.size >= 2:
