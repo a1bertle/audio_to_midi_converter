@@ -1,0 +1,20 @@
+{
+  "mix_path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/inputs/Foals - My Number (Official Audio).mp3",
+  "stems_dir": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/research/2026-04-26_vocal-stem-separation-alternatives/stems/mbr",
+  "sample_rate": 44100,
+  "reconstruction": {
+    "mix_energy_db": 57.07,
+    "stem_sum_energy_db": 46.0,
+    "residual_energy_db": 56.31,
+    "leakage_ratio_db": -0.77
+  },
+  "stems": {
+    "vocals": {
+      "rms_db": -24.29,
+      "stem_to_residual_ratio_db": -10.3,
+      "spectral_centroid_hz": 1893.2,
+      "silence_fraction": 0.2708,
+      "cross_leakage_db": {}
+    }
+  }
+}

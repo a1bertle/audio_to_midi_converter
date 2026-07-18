@@ -1,0 +1,83 @@
+INFO eval_vocal_midi | Measuring MIDI properties ...
+INFO eval_vocal_midi | Loading vocals stem (eZuDklxsaRg_(vocals)_MelBandRoformerSYHFTV3Epsilon.wav) ...
+INFO eval_vocal_midi | Loading mix (eZuDklxsaRg.wav) ...
+INFO eval_vocal_midi | Computing vocal activity ...
+INFO eval_vocal_midi | Running pYIN F0 extraction ...
+INFO eval_vocal_midi | Computing pitch coverage vs MIDI note roll ...
+INFO eval_vocal_midi | Evaluation complete.
+{
+  "midi_properties": {
+    "duration_s": 229.61003373749998,
+    "num_instruments": 1,
+    "total_notes": 520,
+    "pitch_min": 45,
+    "pitch_max": 81,
+    "pitch_range_semitones": 36,
+    "pitch_mean": 69.10576923076923,
+    "pitch_median": 70.0,
+    "note_duration_mean_s": 0.18188092312500015,
+    "note_duration_median_s": 0.14967517499999872,
+    "note_duration_std_s": 0.1269495561801139,
+    "note_duration_min_s": 0.059130933333335634,
+    "note_duration_max_s": 0.9100620208333225,
+    "velocity_mean": 80.0,
+    "velocity_std": 0.0,
+    "tempos_bpm": [
+      135.29297694156696
+    ],
+    "ticks_per_beat": 480
+  },
+  "vocals_audio": {
+    "sample_rate": 44100,
+    "duration_s": 240.3729931972789,
+    "peak_dBFS": -1.5562068223953247
+  },
+  "mix_audio": {
+    "sample_rate": 44100,
+    "duration_s": 240.3729931972789,
+    "peak_dBFS": 4.352973461151123
+  },
+  "vocal_activity": {
+    "rms_thresh_db": -40.0,
+    "total_frames": 20705,
+    "voiced_frames": 13720,
+    "voiced_ratio": 0.6626418739434919,
+    "rms_db_mean": -32.506080627441406,
+    "rms_db_peak": 0.0
+  },
+  "pyin_f0": {
+    "total_frames": 20705,
+    "voiced_frames": 11089,
+    "voiced_ratio": 0.5355711180874185,
+    "f0_hz_mean": 583.5432779406437,
+    "f0_hz_median": 468.8642207165331,
+    "f0_midi_mean": 71.6926774280819,
+    "f0_midi_median": 70.10000000000001,
+    "f0_midi_min": 36.0,
+    "f0_midi_max": 95.6,
+    "f0_midi_range_semitones": 59.599999999999994
+  },
+  "pitch_coverage": {
+    "voiced_frames": 11038,
+    "midi_active_frames": 8136,
+    "co_active_frames": 7207,
+    "coverage_ratio": 0.6529262547562964,
+    "hallucination_ratio": 0.11418387413962636,
+    "pitch_error_mean_semitones": 0.8395587623144164,
+    "pitch_error_median_semitones": 0.20000000000000284,
+    "pitch_error_p90_semitones": 0.7000000000000028,
+    "frames_within_half_semitone_pct": 79.29790481476343,
+    "frames_within_one_semitone_pct": 93.35368391841266
+  },
+  "pitch_histogram": {
+    "pitch_histogram_intersection": 0.767653094259346
+  },
+  "onset_regularity": {
+    "ioi_mean_s": 0.43793847499999994,
+    "ioi_std_s": 1.245110120623306,
+    "ioi_cv": 2.8431165373704745,
+    "ioi_min_s": 0.06005485416665124,
+    "ioi_max_s": 21.08017773333333
+  },
+  "duration_mismatch_s": 10.763
+}

@@ -1,0 +1,48 @@
+{
+  "vocals_stem": "output/2026-04-13_escene-htdemucs-4s-wav/E.scene \uff02\u610f\u8b58\uff02 Music Video/vocals.wav",
+  "duration_s": 245.59,
+  "sample_rate": 44100,
+  "rms_db": -20.25,
+  "basic_pitch_kwargs": {
+    "minimum_frequency": 80.0,
+    "maximum_frequency": 1400.0,
+    "multiple_pitch_bends": false,
+    "frame_threshold": 0.3,
+    "onset_threshold": 0.4,
+    "minimum_note_length": 100
+  },
+  "note_count": 650,
+  "notes_per_second": 2.647,
+  "pitch": {
+    "min": 41,
+    "max": 88,
+    "mean": 64.6,
+    "min_name": "F2",
+    "max_name": "E6"
+  },
+  "duration_ms": {
+    "mean": 177.2
+  },
+  "confidence": {
+    "mean": 0.5921,
+    "median": 0.6242,
+    "low_fraction": 0.0385,
+    "mid_fraction": 0.42,
+    "high_fraction": 0.5415
+  },
+  "vocal_range": {
+    "low_midi": 36,
+    "high_midi": 84,
+    "in_range_count": 649,
+    "in_range_fraction": 0.9985,
+    "out_of_range_count": 1,
+    "out_of_range_fraction": 0.0015
+  },
+  "octave_histogram": {
+    "oct2": 5,
+    "oct3": 110,
+    "oct4": 486,
+    "oct5": 48,
+    "oct6": 1
+  }
+}

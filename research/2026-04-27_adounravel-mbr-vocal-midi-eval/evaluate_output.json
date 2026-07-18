@@ -1,0 +1,97 @@
+{
+  "workdir": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/outputs/2026-04-27_22-03-59_Adounravel_\u6b4c\u3044\u307e\u3057\u305f",
+  "vocals_stem_properties": {
+    "path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/outputs/2026-04-27_22-03-59_Adounravel_\u6b4c\u3044\u307e\u3057\u305f/stems/mbr/eZuDklxsaRg_(vocals)_MelBandRoformerSYHFTV3Epsilon.wav",
+    "duration_s": 240.373,
+    "sample_rate": 44100,
+    "peak_dBFS": -5.094,
+    "rms_dBFS": -21.791,
+    "spectral_centroid_hz": 3675.9,
+    "silence_fraction": 0.3148
+  },
+  "mix_properties": {
+    "path": "/Users/albertle/Documents/programming/dev/audio_to_midi_converter/audio_to_midi_converter/outputs/2026-04-27_22-03-59_Adounravel_\u6b4c\u3044\u307e\u3057\u305f/extracted/eZuDklxsaRg.wav",
+    "duration_s": 240.373,
+    "sample_rate": 44100,
+    "peak_dBFS": 4.353,
+    "rms_dBFS": -6.745,
+    "spectral_centroid_hz": 3684.9,
+    "silence_fraction": 0.0312
+  },
+  "midi_eval": {
+    "midi_properties": {
+      "duration_s": 229.52965262499998,
+      "num_instruments": 1,
+      "total_notes": 512,
+      "pitch_min": 52,
+      "pitch_max": 81,
+      "pitch_range_semitones": 29,
+      "pitch_mean": 69.69921875,
+      "pitch_median": 70.0,
+      "note_duration_mean_s": 0.189244971940105,
+      "note_duration_median_s": 0.14967517499999872,
+      "note_duration_std_s": 0.1355473365092029,
+      "note_duration_min_s": 0.059130933333335634,
+      "note_duration_max_s": 0.8897357624999813,
+      "velocity_mean": 80.0,
+      "velocity_std": 0.0,
+      "tempos_bpm": [
+        135.29297694156696
+      ],
+      "ticks_per_beat": 480
+    },
+    "vocals_audio": {
+      "sample_rate": 44100,
+      "duration_s": 240.3729931972789,
+      "peak_dBFS": -5.093741416931152
+    },
+    "mix_audio": {
+      "sample_rate": 44100,
+      "duration_s": 240.3729931972789,
+      "peak_dBFS": 4.352973461151123
+    },
+    "vocal_activity": {
+      "rms_thresh_db": -40.0,
+      "total_frames": 20705,
+      "voiced_frames": 13720,
+      "voiced_ratio": 0.6626418739434919,
+      "rms_db_mean": -32.557064056396484,
+      "rms_db_peak": 0.0
+    },
+    "pyin_f0": {
+      "total_frames": 20705,
+      "voiced_frames": 10811,
+      "voiced_ratio": 0.5221444095629075,
+      "f0_hz_mean": 552.8786610674829,
+      "f0_hz_median": 468.8642207165331,
+      "f0_midi_mean": 71.1758394228101,
+      "f0_midi_median": 70.10000000000001,
+      "f0_midi_min": 40.5,
+      "f0_midi_max": 95.6,
+      "f0_midi_range_semitones": 55.099999999999994
+    },
+    "pitch_coverage": {
+      "voiced_frames": 10762,
+      "midi_active_frames": 8351,
+      "co_active_frames": 7415,
+      "coverage_ratio": 0.6889983274484297,
+      "hallucination_ratio": 0.11208238534307269,
+      "pitch_error_mean_semitones": 0.6147943358057989,
+      "pitch_error_median_semitones": 0.20000000000000284,
+      "pitch_error_p90_semitones": 0.7000000000000028,
+      "frames_within_half_semitone_pct": 80.21577882670263,
+      "frames_within_one_semitone_pct": 93.7154416722859
+    },
+    "pitch_histogram": {
+      "pitch_histogram_intersection": 0.782274738224652
+    },
+    "onset_regularity": {
+      "ioi_mean_s": 0.4447946546477495,
+      "ioi_std_s": 0.9622717634114445,
+      "ioi_cv": 2.163406761651634,
+      "ioi_min_s": 0.059130933333335634,
+      "ioi_max_s": 14.380827770833331
+    },
+    "duration_mismatch_s": 10.843
+  }
+}

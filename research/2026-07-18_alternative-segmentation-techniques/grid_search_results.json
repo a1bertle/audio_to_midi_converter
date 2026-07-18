@@ -1,0 +1,252 @@
+[
+  {
+    "stay_prob": 0.985,
+    "tolerance": 0.5,
+    "note_count": 739,
+    "coverage_pct": 74.75,
+    "hallucination_pct": 13.02,
+    "pitch_within_half_st_pct": 78.47,
+    "median_note_duration_ms": 110.0,
+    "ioi_cv": 2.37
+  },
+  {
+    "stay_prob": 0.985,
+    "tolerance": 0.75,
+    "note_count": 643,
+    "coverage_pct": 79.68,
+    "hallucination_pct": 13.51,
+    "pitch_within_half_st_pct": 74.12,
+    "median_note_duration_ms": 150.0,
+    "ioi_cv": 2.199
+  },
+  {
+    "stay_prob": 0.985,
+    "tolerance": 1.0,
+    "note_count": 560,
+    "coverage_pct": 81.32,
+    "hallucination_pct": 13.7,
+    "pitch_within_half_st_pct": 69.78,
+    "median_note_duration_ms": 170.0,
+    "ioi_cv": 1.946
+  },
+  {
+    "stay_prob": 0.985,
+    "tolerance": 1.5,
+    "note_count": 469,
+    "coverage_pct": 83.08,
+    "hallucination_pct": 14.33,
+    "pitch_within_half_st_pct": 62.64,
+    "median_note_duration_ms": 210.0,
+    "ioi_cv": 1.781
+  },
+  {
+    "stay_prob": 0.985,
+    "tolerance": 2.0,
+    "note_count": 399,
+    "coverage_pct": 83.63,
+    "hallucination_pct": 14.54,
+    "pitch_within_half_st_pct": 55.28,
+    "median_note_duration_ms": 240.0,
+    "ioi_cv": 1.634
+  },
+  {
+    "stay_prob": 0.999,
+    "tolerance": 0.5,
+    "note_count": 739,
+    "coverage_pct": 74.75,
+    "hallucination_pct": 13.02,
+    "pitch_within_half_st_pct": 78.47,
+    "median_note_duration_ms": 110.0,
+    "ioi_cv": 2.37
+  },
+  {
+    "stay_prob": 0.999,
+    "tolerance": 0.75,
+    "note_count": 643,
+    "coverage_pct": 79.68,
+    "hallucination_pct": 13.51,
+    "pitch_within_half_st_pct": 74.12,
+    "median_note_duration_ms": 150.0,
+    "ioi_cv": 2.199
+  },
+  {
+    "stay_prob": 0.999,
+    "tolerance": 1.0,
+    "note_count": 560,
+    "coverage_pct": 81.32,
+    "hallucination_pct": 13.7,
+    "pitch_within_half_st_pct": 69.78,
+    "median_note_duration_ms": 170.0,
+    "ioi_cv": 1.946
+  },
+  {
+    "stay_prob": 0.999,
+    "tolerance": 1.5,
+    "note_count": 469,
+    "coverage_pct": 83.08,
+    "hallucination_pct": 14.33,
+    "pitch_within_half_st_pct": 62.64,
+    "median_note_duration_ms": 210.0,
+    "ioi_cv": 1.781
+  },
+  {
+    "stay_prob": 0.999,
+    "tolerance": 2.0,
+    "note_count": 399,
+    "coverage_pct": 83.63,
+    "hallucination_pct": 14.54,
+    "pitch_within_half_st_pct": 55.28,
+    "median_note_duration_ms": 240.0,
+    "ioi_cv": 1.634
+  },
+  {
+    "stay_prob": 0.9995,
+    "tolerance": 0.5,
+    "note_count": 739,
+    "coverage_pct": 74.75,
+    "hallucination_pct": 13.02,
+    "pitch_within_half_st_pct": 78.47,
+    "median_note_duration_ms": 110.0,
+    "ioi_cv": 2.37
+  },
+  {
+    "stay_prob": 0.9995,
+    "tolerance": 0.75,
+    "note_count": 643,
+    "coverage_pct": 79.68,
+    "hallucination_pct": 13.51,
+    "pitch_within_half_st_pct": 74.12,
+    "median_note_duration_ms": 150.0,
+    "ioi_cv": 2.199
+  },
+  {
+    "stay_prob": 0.9995,
+    "tolerance": 1.0,
+    "note_count": 560,
+    "coverage_pct": 81.32,
+    "hallucination_pct": 13.7,
+    "pitch_within_half_st_pct": 69.78,
+    "median_note_duration_ms": 170.0,
+    "ioi_cv": 1.946
+  },
+  {
+    "stay_prob": 0.9995,
+    "tolerance": 1.5,
+    "note_count": 469,
+    "coverage_pct": 83.08,
+    "hallucination_pct": 14.33,
+    "pitch_within_half_st_pct": 62.64,
+    "median_note_duration_ms": 210.0,
+    "ioi_cv": 1.781
+  },
+  {
+    "stay_prob": 0.9995,
+    "tolerance": 2.0,
+    "note_count": 399,
+    "coverage_pct": 83.63,
+    "hallucination_pct": 14.54,
+    "pitch_within_half_st_pct": 55.28,
+    "median_note_duration_ms": 240.0,
+    "ioi_cv": 1.634
+  },
+  {
+    "stay_prob": 0.9999,
+    "tolerance": 0.5,
+    "note_count": 739,
+    "coverage_pct": 74.75,
+    "hallucination_pct": 13.02,
+    "pitch_within_half_st_pct": 78.47,
+    "median_note_duration_ms": 110.0,
+    "ioi_cv": 2.37
+  },
+  {
+    "stay_prob": 0.9999,
+    "tolerance": 0.75,
+    "note_count": 643,
+    "coverage_pct": 79.68,
+    "hallucination_pct": 13.51,
+    "pitch_within_half_st_pct": 74.12,
+    "median_note_duration_ms": 150.0,
+    "ioi_cv": 2.199
+  },
+  {
+    "stay_prob": 0.9999,
+    "tolerance": 1.0,
+    "note_count": 560,
+    "coverage_pct": 81.32,
+    "hallucination_pct": 13.7,
+    "pitch_within_half_st_pct": 69.78,
+    "median_note_duration_ms": 170.0,
+    "ioi_cv": 1.946
+  },
+  {
+    "stay_prob": 0.9999,
+    "tolerance": 1.5,
+    "note_count": 469,
+    "coverage_pct": 83.08,
+    "hallucination_pct": 14.33,
+    "pitch_within_half_st_pct": 62.64,
+    "median_note_duration_ms": 210.0,
+    "ioi_cv": 1.781
+  },
+  {
+    "stay_prob": 0.9999,
+    "tolerance": 2.0,
+    "note_count": 399,
+    "coverage_pct": 83.63,
+    "hallucination_pct": 14.54,
+    "pitch_within_half_st_pct": 55.28,
+    "median_note_duration_ms": 240.0,
+    "ioi_cv": 1.634
+  },
+  {
+    "stay_prob": 0.99995,
+    "tolerance": 0.5,
+    "note_count": 739,
+    "coverage_pct": 74.75,
+    "hallucination_pct": 13.02,
+    "pitch_within_half_st_pct": 78.47,
+    "median_note_duration_ms": 110.0,
+    "ioi_cv": 2.37
+  },
+  {
+    "stay_prob": 0.99995,
+    "tolerance": 0.75,
+    "note_count": 643,
+    "coverage_pct": 79.68,
+    "hallucination_pct": 13.51,
+    "pitch_within_half_st_pct": 74.12,
+    "median_note_duration_ms": 150.0,
+    "ioi_cv": 2.199
+  },
+  {
+    "stay_prob": 0.99995,
+    "tolerance": 1.0,
+    "note_count": 560,
+    "coverage_pct": 81.32,
+    "hallucination_pct": 13.7,
+    "pitch_within_half_st_pct": 69.78,
+    "median_note_duration_ms": 170.0,
+    "ioi_cv": 1.946
+  },
+  {
+    "stay_prob": 0.99995,
+    "tolerance": 1.5,
+    "note_count": 469,
+    "coverage_pct": 83.08,
+    "hallucination_pct": 14.33,
+    "pitch_within_half_st_pct": 62.64,
+    "median_note_duration_ms": 210.0,
+    "ioi_cv": 1.781
+  },
+  {
+    "stay_prob": 0.99995,
+    "tolerance": 2.0,
+    "note_count": 399,
+    "coverage_pct": 83.63,
+    "hallucination_pct": 14.54,
+    "pitch_within_half_st_pct": 55.28,
+    "median_note_duration_ms": 240.0,
+    "ioi_cv": 1.634
+  }
+]

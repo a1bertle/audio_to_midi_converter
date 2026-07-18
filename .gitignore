@@ -42,4 +42,13 @@ user.settings.json
 
 # Research session stem directories (large binaries, reproducible)
 research/**/stems/
+research/**/cache/*.npy
 notebooks/**/*-checkpoint.ipynb
+
+# Model checkpoints and vendored source clones (large/nested, redownloadable)
+*.pt
+research/**/rmvpe_src/
+
+# Claude Code agent tooling state (not project source)
+memory/
+.claude/settings.json

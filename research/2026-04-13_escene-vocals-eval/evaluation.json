@@ -1,0 +1,73 @@
+{
+  "mix": {
+    "path": "/tmp/yt_download/E.scene \uff02\u610f\u8b58\uff02 Music Video.mp3",
+    "duration_s": 245.59,
+    "sample_rate": 44100,
+    "rms_db": -11.23,
+    "peak_db": 0.44,
+    "clipping_fraction": 3.2e-05,
+    "lufs_estimate": -11.92,
+    "spectral_centroid_hz": 2041.3
+  },
+  "reconstruction": {
+    "mix_energy_db": 59.12,
+    "stem_sum_energy_db": 57.9,
+    "residual_energy_db": 60.83,
+    "leakage_ratio_db": 1.7
+  },
+  "stems": {
+    "vocals": {
+      "rms_db": -20.27,
+      "peak_db": -0.7,
+      "srr_db": -10.75,
+      "spectral_centroid_hz": 4325.9,
+      "silence_fraction": 0.3644,
+      "clipping_fraction": 0.0,
+      "cross_leakage_db": {
+        "drums": -13.29,
+        "bass": -22.47,
+        "other": -5.13
+      },
+      "vocal_presence_ratio": 0.3529
+    },
+    "drums": {
+      "rms_db": -18.67,
+      "peak_db": -0.21,
+      "srr_db": -9.15,
+      "spectral_centroid_hz": 2977.6,
+      "silence_fraction": 0.1137,
+      "clipping_fraction": 0.0,
+      "cross_leakage_db": {
+        "vocals": -13.29,
+        "bass": -4.7,
+        "other": -13.32
+      }
+    },
+    "bass": {
+      "rms_db": -15.15,
+      "peak_db": -0.24,
+      "srr_db": -5.63,
+      "spectral_centroid_hz": 588.8,
+      "silence_fraction": 0.0623,
+      "clipping_fraction": 0.0,
+      "cross_leakage_db": {
+        "vocals": -22.47,
+        "drums": -4.7,
+        "other": -15.39
+      }
+    },
+    "other": {
+      "rms_db": -28.31,
+      "peak_db": -7.57,
+      "srr_db": -18.79,
+      "spectral_centroid_hz": 1770.7,
+      "silence_fraction": 0.023,
+      "clipping_fraction": 0.0,
+      "cross_leakage_db": {
+        "vocals": -5.13,
+        "drums": -13.32,
+        "bass": -15.39
+      }
+    }
+  }
+}
