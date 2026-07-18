@@ -30,6 +30,7 @@ dist/
 *.ogg
 *.aac
 output/
+outputs/
 inputs/
 
 # Logs

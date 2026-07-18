@@ -1,7 +1,7 @@
 """Vocal transcription backend using RMVPE pitch tracker.
 
 Pipeline:
-  1. Stem separation (htdemucs 4-stem via demucs) → vocals.wav
+  1. Stem separation (Mel-Band RoFormer via audio-separator) → vocals.wav
   2. Pitch tracking (RMVPE) → F0 contour at 10 ms hop
   3. Onset detection (librosa) → syllable boundary times
   4. Note segmentation (semitone-snap, silence-aware merge, beat-gated onset split)
@@ -35,6 +35,10 @@ LOGGER = logging.getLogger(__name__)
 _DEFAULT_CHECKPOINT_DIR = Path.home() / ".cache" / "audio2midi"
 _CHECKPOINT_FILENAME = "rmvpe.pt"
 _HF_REPO = "lj1995/VoiceConversionWebUI"
+
+# Vocal stem separation — Mel-Band RoFormer (audio-separator)
+_MBR_MODEL = "MelBandRoformerSYHFTV3Epsilon.ckpt"
+_MBR_MODEL_DIR = Path.home() / ".cache" / "audio2midi" / "audio-separator-models"
 
 # RMVPE inference constants
 _TARGET_SR = 16000
@@ -131,14 +135,70 @@ def _parse_beat_times(click_wav_path: Path) -> np.ndarray:
     return beat_times.astype(float)
 
 
+def _find_vocals_file(search_dir: Path, audio_stem: str | None = None) -> Path | None:
+    """Return a matching vocals WAV in ``search_dir``, if one exists."""
+    for candidate in search_dir.iterdir():
+        stem_matches = audio_stem is None or candidate.name.startswith(f"{audio_stem}_")
+        if (
+            candidate.suffix.lower() == ".wav"
+            and "vocals" in candidate.name.lower()
+            and stem_matches
+        ):
+            return candidate
+    return None
+
+
 def _separate_vocals(audio_path: Path, out_dir: Path) -> Path:
-    """Run htdemucs 4-stem separation and return path to vocals.wav."""
+    """Separate vocals using Mel-Band RoFormer (audio-separator).
+
+    Falls back to htdemucs if audio-separator is not installed.
+    Output: path to the vocals WAV file.
+    """
+    try:
+        from audio_separator.separator import Separator  # noqa: F401
+    except ImportError:
+        LOGGER.warning(
+            "audio-separator not installed; falling back to htdemucs. "
+            "Install with: pip install audio-separator"
+        )
+        return _separate_vocals_htdemucs(audio_path, out_dir)
+
+    mbr_out = out_dir / "mbr"
+    mbr_out.mkdir(parents=True, exist_ok=True)
+    _MBR_MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+    existing_vocals = _find_vocals_file(mbr_out, audio_path.stem)
+    if existing_vocals is not None:
+        LOGGER.info("Reusing existing MBR vocals stem: %s", existing_vocals)
+        return existing_vocals
+
+    LOGGER.info("Running Mel-Band RoFormer stem separation (model: %s)...", _MBR_MODEL)
+    separator = Separator(
+        model_file_dir=str(_MBR_MODEL_DIR),
+        output_dir=str(mbr_out),
+        output_format="wav",
+        output_single_stem="Vocals",
+    )
+    separator.load_model(model_filename=_MBR_MODEL)
+    separator.separate(str(audio_path))
+
+    vocals_path = _find_vocals_file(mbr_out, audio_path.stem)
+    if vocals_path is None or not vocals_path.exists():
+        raise TranscriptionError(
+            f"audio-separator did not produce a vocals stem in {mbr_out}"
+        )
+    LOGGER.info("Vocals stem (MBR): %s", vocals_path)
+    return vocals_path
+
+
+def _separate_vocals_htdemucs(audio_path: Path, out_dir: Path) -> Path:
+    """Fallback: run htdemucs 4-stem separation and return path to vocals.wav."""
     try:
         import demucs.separate  # noqa: F401 – presence check only
     except ImportError as exc:
         raise MissingDependencyError(
-            "demucs is required for vocal stem separation. "
-            "Install with: pip install demucs"
+            "Neither audio-separator nor demucs is installed. "
+            "Install with: pip install audio-separator"
         ) from exc
     out_dir.mkdir(parents=True, exist_ok=True)
     cmd = [
@@ -148,7 +208,7 @@ def _separate_vocals(audio_path: Path, out_dir: Path) -> Path:
         "--out", str(out_dir),
         str(audio_path),
     ]
-    LOGGER.info("Running htdemucs stem separation...")
+    LOGGER.info("Running htdemucs stem separation (fallback)...")
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
     if result.returncode != 0:
         raise TranscriptionError(
@@ -157,14 +217,13 @@ def _separate_vocals(audio_path: Path, out_dir: Path) -> Path:
     stem_dir = out_dir / "htdemucs" / audio_path.stem
     vocals_path = stem_dir / "vocals.wav"
     if not vocals_path.exists():
-        # demucs sometimes uses the full filename as the stem dir name
         candidates = list(out_dir.rglob("vocals.wav"))
         if not candidates:
             raise TranscriptionError(
                 f"vocals.wav not found after separation in {out_dir}"
             )
         vocals_path = candidates[0]
-    LOGGER.info("Vocals stem: %s", vocals_path)
+    LOGGER.info("Vocals stem (htdemucs): %s", vocals_path)
     return vocals_path
 
 
@@ -272,6 +331,52 @@ def _nearest_beat_distance(t: float, beat_times: np.ndarray) -> float:
     return float(np.min(np.abs(candidates - t)))
 
 
+def _short_internal_unvoiced_gaps(
+    voiced: np.ndarray,
+    max_gap_frames: int,
+) -> np.ndarray:
+    """Mask unvoiced runs no longer than ``max_gap_frames`` enclosed by voicing."""
+    preserve = np.zeros(len(voiced), dtype=bool)
+    unvoiced = ~voiced.astype(bool)
+    changes = np.diff(np.pad(unvoiced.astype(np.int8), (1, 1)))
+    starts = np.flatnonzero(changes == 1)
+    ends = np.flatnonzero(changes == -1)
+    for start, end in zip(starts, ends):
+        if (
+            end - start <= max_gap_frames
+            and start > 0
+            and end < len(voiced)
+            and voiced[start - 1]
+            and voiced[end]
+        ):
+            preserve[start:end] = True
+    return preserve
+
+
+def _clip_notes_to_voiced_spans(
+    raw: list[tuple[float, float, int]],
+    f0_hz: np.ndarray,
+    min_note_duration_s: float,
+) -> list[tuple[float, float, int]]:
+    """Clip notes to contiguous voiced spans after merge and extension passes."""
+    clipped: list[tuple[float, float, int]] = []
+    for start_s, end_s, note in raw:
+        start_frame = max(0, int(np.floor(start_s / _HOP_S)))
+        end_frame = min(len(f0_hz), int(np.ceil(end_s / _HOP_S)))
+        if end_frame <= start_frame:
+            continue
+        voiced = f0_hz[start_frame:end_frame] > 0
+        changes = np.diff(np.pad(voiced.astype(np.int8), (1, 1)))
+        span_starts = np.flatnonzero(changes == 1) + start_frame
+        span_ends = np.flatnonzero(changes == -1) + start_frame
+        for span_start, span_end in zip(span_starts, span_ends):
+            clipped_start = max(start_s, span_start * _HOP_S)
+            clipped_end = min(end_s, span_end * _HOP_S)
+            if clipped_end - clipped_start >= min_note_duration_s:
+                clipped.append((clipped_start, clipped_end, note))
+    return clipped
+
+
 def _snap_to_grid(t: float, beat_times: np.ndarray, subdivisions: int) -> float:
     """Snap time t to the nearest beat subdivision on the beat grid.
 
@@ -345,6 +450,11 @@ def _pitch_track_to_notes(
                     raw.append((note_start, float(t), note_midi))
                 in_note = False
 
+    if in_note:
+        track_end = len(f0_hz) * _HOP_S
+        if track_end - note_start >= min_note_duration_s:
+            raw.append((note_start, track_end, note_midi))
+
     # Silence-aware merge: collapse short ornament notes but never across gaps
     max_silence_s = min_note_duration_s * 0.5
     gap_s = min_note_duration_s * 1.5
@@ -392,12 +502,13 @@ def _pitch_track_to_notes(
     # Onset-based syllable splitting — beat-gated when beat_times provided.
     # A split is only allowed when the onset aligns to a beat (within 25% of
     # the beat interval) OR when no beat grid is available.
-    # The minimum fragment length is raised to a 16th note to suppress
-    # sub-rhythmic artifacts.
+    # The minimum fragment length is raised to an 8th note to suppress
+    # sub-rhythmic artifacts (was 16th note; raised per proposal
+    # plans/2026-04-27_segmentation-coverage-hallucination).
     beat_arr = np.sort(beat_times) if beat_times is not None and len(beat_times) > 0 \
         else np.array([], dtype=float)
-    sixteenth_s = (60.0 / bpm) / 4.0  # one 16th note duration
-    split_min_s = max(min_note_duration_s, sixteenth_s)
+    eighth_s = (60.0 / bpm) / 2.0  # one 8th note duration
+    split_min_s = max(min_note_duration_s, eighth_s)
 
     if beat_arr.size > 0:
         # Estimate beat interval from median gap between consecutive beats.
@@ -407,11 +518,19 @@ def _pitch_track_to_notes(
         beat_interval = 60.0 / bpm
         beat_tolerance = beat_interval  # no gating — allow all onsets
 
+    # Onset split is only applied to notes at least a half note long.
+    # Shorter notes are already individual syllables and must not be re-cut.
+    half_note_s = 2.0 * 60.0 / bpm  # two beats at tempo
     if len(onset_times) > 0:
         split: list[tuple[float, float, int]] = []
         onset_arr = np.sort(onset_times)
         margin = split_min_s * 0.5
         for start_s, end_s, note in raw:
+            note_dur = end_s - start_s
+            if note_dur < half_note_s:
+                # Too short to contain a distinct second syllable — skip split.
+                split.append((start_s, end_s, note))
+                continue
             interior = onset_arr[
                 (onset_arr > start_s + margin) & (onset_arr < end_s - margin)
             ]
@@ -434,10 +553,37 @@ def _pitch_track_to_notes(
     # clean up any same-pitch adjacencies it reintroduced.
     raw = _merge_same_pitch(raw, quarter_s, beat_arr_pre, pre_beat_tol)
 
-    # F0-guided gap-fill: extend notes into short same-pitch voiced gaps that
-    # the merge passes missed (e.g. vibrato troughs, soft consonants below the
-    # voicing threshold).  Uses the already median-filtered f0_hz array.
-    raw = _gap_fill(raw, f0_hz, quarter_s)
+    # F0-guided gap-fill: extend notes into same-pitch voiced gaps up to one
+    # half note (raised from quarter note per proposal
+    # plans/2026-04-27_segmentation-coverage-hallucination).
+    half_note_s = 2.0 * 60.0 / bpm
+    raw = _gap_fill(raw, f0_hz, half_note_s)
+
+    # Voiced-frame holdout extension: extend each note's end time forward
+    # frame-by-frame while RMVPE voices the same pitch, up to 200 ms max.
+    # Closes coverage gaps left by the min_note_duration_s filter on note tails.
+    _HOLDOUT_MAX_S = 0.200
+    extended: list[tuple[float, float, int]] = []
+    for start_s, end_s, note in raw:
+        end_frame = int(round(end_s / _HOP_S))
+        max_frame = min(len(f0_hz), end_frame + int(round(_HOLDOUT_MAX_S / _HOP_S)))
+        lo = librosa.note_to_hz("C2")
+        hi = librosa.note_to_hz("C6")
+        while end_frame < max_frame:
+            hz = f0_hz[end_frame]
+            if hz <= 0 or hz < lo or hz > hi:
+                break
+            snapped = int(round(12 * np.log2(hz / 440.0) + 69))
+            if snapped != note:
+                break
+            end_frame += 1
+        extended.append((start_s, end_frame * _HOP_S, note))
+    raw = extended
+
+    # Merge passes represent intentional continuity, but must not turn a
+    # remaining unvoiced region into an active MIDI hold. Short pYIN gaps were
+    # already preserved before segmentation; split only at longer gaps here.
+    raw = _clip_notes_to_voiced_spans(raw, f0_hz, min_note_duration_s)
 
     # Snap note boundaries to nearest 16th-note subdivision on the beat grid.
     if snap_to_beats and beat_arr.size >= 2:
@@ -459,11 +605,12 @@ def _pitch_track_to_notes(
 
 
 class RmvpeTranscriber(BaseTranscriber):
-    """Vocal melody transcriber: htdemucs → RMVPE → beat-gated onset split → NoteEvents.
+    """Vocal melody transcriber: MBR → RMVPE → beat-gated onset split → NoteEvents.
 
-    BPM and beat_times are supplied externally (run bpm_detect on the raw mix
-    before calling transcribe). This keeps tempo detection on a full-spectrum
-    signal rather than a stem-separated vocals track.
+    Stem separation uses Mel-Band RoFormer (audio-separator) with htdemucs as
+    a fallback. BPM and beat_times are supplied externally (run bpm_detect on
+    the raw mix before calling transcribe). This keeps tempo detection on a
+    full-spectrum signal rather than a stem-separated vocals track.
     """
 
     def __init__(
@@ -522,6 +669,84 @@ class RmvpeTranscriber(BaseTranscriber):
             model = self._get_model()
             y, _ = librosa.load(str(vocals_path), sr=_TARGET_SR, mono=True)
             f0 = model.infer_from_audio(y, thred=0.03)
+
+            # 2b. pYIN gap-bridge: within each RMVPE-voiced segment, extend
+            # into immediately adjacent unvoiced frames where pYIN confirms
+            # the same pitch.  Does NOT create new notes in silent regions —
+            # only bridges short gaps inside existing voiced spans.
+            LOGGER.info("Running pYIN gap-bridge pass...")
+            f0_pyin, voiced_flag, _ = librosa.pyin(
+                y,
+                fmin=float(librosa.note_to_hz("C2")),
+                fmax=float(librosa.note_to_hz("C6")),
+                sr=_TARGET_SR,
+                hop_length=int(_HOP_S * _TARGET_SR),  # 160 samples = 10 ms
+                fill_na=0.0,
+            )
+            f0_pyin = np.where(voiced_flag, f0_pyin, 0.0)
+            n = min(len(f0), len(f0_pyin))
+            f0_work = f0[:n].copy()
+            pyin_n = f0_pyin[:n]
+
+            # Build RMVPE voiced mask and dilate it by ±_BRIDGE_FRAMES to
+            # define the zone where pYIN fill-in is allowed.
+            _BRIDGE_FRAMES = int(round(0.200 / _HOP_S))  # 200 ms each side
+            rmvpe_voiced = f0_work > 0
+            from scipy.ndimage import binary_dilation
+            bridge_zone = binary_dilation(rmvpe_voiced, iterations=_BRIDGE_FRAMES)
+
+            # Only patch frames that are (a) unvoiced in RMVPE, (b) inside the
+            # bridge zone around a voiced segment, and (c) voiced in pYIN, and
+            # (d) pYIN pitch is within ±1 semitone of the nearest RMVPE-voiced
+            # neighbor (pitch-consistency gate to suppress hallucination).
+            candidate_mask = (~rmvpe_voiced) & bridge_zone & (pyin_n > 0)
+
+            # For each candidate frame, find nearest RMVPE-voiced neighbor pitch.
+            voiced_indices = np.where(rmvpe_voiced)[0]
+            if len(voiced_indices) > 0 and np.any(candidate_mask):
+                candidate_indices = np.where(candidate_mask)[0]
+                # searchsorted gives insertion point; clamp to valid range.
+                ins = np.searchsorted(voiced_indices, candidate_indices)
+                ins_left = np.clip(ins - 1, 0, len(voiced_indices) - 1)
+                ins_right = np.clip(ins, 0, len(voiced_indices) - 1)
+                # Pick closer neighbor (by frame distance).
+                dist_left = candidate_indices - voiced_indices[ins_left]
+                dist_right = voiced_indices[ins_right] - candidate_indices
+                nearest_idx = np.where(
+                    dist_left <= dist_right,
+                    voiced_indices[ins_left],
+                    voiced_indices[ins_right],
+                )
+                nearest_f0 = f0_work[nearest_idx]
+                # Convert both to MIDI semitones for comparison.
+                pyin_midi = 12 * np.log2(pyin_n[candidate_indices] / 440.0 + 1e-9) + 69
+                near_midi = 12 * np.log2(nearest_f0 / 440.0 + 1e-9) + 69
+                consistent = np.abs(pyin_midi - near_midi) <= 1.0
+                patch_indices = candidate_indices[consistent]
+            else:
+                patch_indices = np.array([], dtype=int)
+
+            f0_work[patch_indices] = pyin_n[patch_indices]
+
+            # pYIN veto gate: zero RMVPE-only frames except inside short pYIN
+            # unvoiced gaps enclosed by pYIN voicing. This trims the measured
+            # onset/offset overhang without cutting brief vibrato troughs.
+            pyin_voiced_flag = voiced_flag[:n]
+            rmvpe_voiced_updated = f0_work > 0
+            short_gap_zone = _short_internal_unvoiced_gaps(
+                pyin_voiced_flag, _BRIDGE_FRAMES
+            )
+            veto_mask = (
+                rmvpe_voiced_updated & (~pyin_voiced_flag) & (~short_gap_zone)
+            )
+            vetoed = int(np.sum(veto_mask))
+            f0_work[veto_mask] = 0.0
+            f0 = f0_work
+            LOGGER.info(
+                "pYIN gap-bridge: patched %d/%d candidate frames "
+                "(pitch-consistent); vetoed %d RMVPE frames",
+                len(patch_indices), int(np.sum(candidate_mask)), vetoed,
+            )
 
             # 3. Onset detection on native-sr vocals stem
             y_native, sr_native = librosa.load(str(vocals_path), sr=None, mono=True)

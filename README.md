@@ -1,13 +1,14 @@
 # audio_to_midi_converter
 
-Python CLI for transcribing vocal performances from YouTube into MIDI. Uses RMVPE pitch tracking with beat-aware note snapping by default. Also supports piano and guitar.
+Python CLI for transcribing local media or YouTube performances into MIDI. Uses RMVPE pitch tracking with beat-aware note snapping by default. Also supports piano and guitar.
 
 ## What this does
 - Downloads YouTube audio (`yt-dlp`)
+- Accepts existing local audio/video files without downloading
 - Converts media to WAV (`ffmpeg`)
 - Preprocesses audio (normalize, high-pass, optional denoise)
 - Transcribes with piano-focused backend (`piano-transcription-inference`) or fallback (`basic-pitch`)
-- Transcribes vocals using RMVPE pitch tracker with beat-aware note snapping
+- Transcribes vocals using Mel-Band RoFormer stem separation + RMVPE pitch tracker with beat-aware note snapping
 - Writes output MIDI
 
 ## Requirements
@@ -34,6 +35,15 @@ Alternative without activating shell:
 .venv/bin/pip install -r requirements.txt
 ```
 
+Piano-focused backends are optional and may require a separate environment when
+their TensorFlow constraints conflict with the MBR vocal stack:
+
+```bash
+pip install -e '.[piano]'
+# Or, in a separate venv:
+pip install -e '.[basic-pitch]'
+```
+
 ## Run
 
 Outputs (MIDI, extracted WAV, preprocessed WAV) are saved to `outputs/<video_name>/` by default.
@@ -42,6 +52,13 @@ Outputs (MIDI, extracted WAV, preprocessed WAV) are saved to `outputs/<video_nam
 ```bash
 scripts/run_audio2midi.sh \
   --youtube-url "https://www.youtube.com/watch?v=VIDEO_ID"
+```
+
+### Local media
+```bash
+scripts/run_audio2midi.sh \
+  --input-file "inputs/performance.mp3" \
+  --instrument vocals
 ```
 
 ### Piano
@@ -93,6 +110,7 @@ scripts/run_audio2midi.sh --help
 ```
 
 Key options:
+- `--youtube-url <url>` or `--input-file <path>` — mutually exclusive media source
 - `--instrument {piano,guitar,vocals}` — target instrument (default: vocals)
 - `--backend {pti,piano-transcription-inference,basic-pitch,rmvpe}` — override transcription backend
 - `--device cpu|cuda`
@@ -109,9 +127,12 @@ Vocals-specific options:
 - `--snap-to-beats` — snap note boundaries to 16th-note grid on the detected beat grid
 - `--f0-filter-frames <n>` — median filter window in frames (10 ms each) for F0 smoothing (default: 7)
 
-Note segmentation internals (not exposed via CLI; tuned per proposal `plans/2026-04-26_vocal-midi-coverage-fragmentation/`):
+Note segmentation internals (not exposed via CLI; tuned by the vocal optimization plans):
 - Same-pitch note merge ceiling: **one quarter note** (was one 8th note). Wider ceiling collapses repeated same-pitch fragments from vibrato trough interruptions; the existing beat-gate prevents merging across genuine rhythmic repetitions.
-- F0-guided gap-fill: after merge passes, adjacent same-pitch notes whose gap contains a voiced F0 frame of the same semitone are merged. Activates when beat-gating blocked a merge but the gap contains real vocal signal.
+- F0-guided gap-fill ceiling: **one half note**. Adjacent same-pitch notes are merged only when their gap contains matching voiced F0 evidence.
+- pYIN bridge/veto: pitch-consistent pYIN frames bridge short RMVPE gaps, while RMVPE-only onset/offset overhang is removed except in short enclosed voicing gaps.
+- Final voiced-span clipping prevents merge passes from holding MIDI notes across remaining unvoiced regions.
+- Existing MBR vocals stems in a workdir are reused on reruns.
 
 ## PTI model details
 - Default backend is `pti` (`piano-transcription-inference`)
@@ -150,6 +171,8 @@ scripts/run_audio2midi.sh \
   --output out.mid \
   --backend basic-pitch
 ```
+- First vocals run downloads the MBR model (~400 MB) to `~/.cache/audio2midi/audio-separator-models/` automatically.
+- If `audio-separator` is unavailable, the pipeline falls back to `htdemucs` (install with `pip install demucs`).
 
 ## Evaluating output quality
 
@@ -162,10 +185,16 @@ source .venv/bin/activate
 # From a workdir (paths auto-discovered):
 python scripts/eval_vocal_midi.py --workdir "outputs/<timestamp>_<name>/"
 
+# Save the report and hallucination-region diagnostics:
+python scripts/eval_vocal_midi.py \
+  --workdir "outputs/<timestamp>_<name>/" \
+  --json-out research/<date>_<topic>-eval/measurements.json \
+  --regions-out research/<date>_<topic>-eval/hallucination-regions.json
+
 # Or with explicit paths:
 python scripts/eval_vocal_midi.py \
   "outputs/<workdir>/<name>.mid" \
-  "outputs/<workdir>/stems/htdemucs/<track>/vocals.wav" \
+  "outputs/<workdir>/stems/mbr/<track>_(Vocals)_MelBandRoformerSYHFTV3Epsilon.wav" \
   "outputs/<workdir>/extracted/<track>.wav"
 ```
 
@@ -175,12 +204,10 @@ Outputs JSON to stdout with:
 - `pitch_coverage.frames_within_half_semitone_pct` — pitch accuracy on covered frames (target ≥ 85%)
 - `onset_regularity.ioi_cv` — note fragmentation (target ≤ 1.0)
 - `midi_properties.note_duration_median_s` — median note length (target ≥ 0.3 s for phrase-level)
+- `duration_mismatch_s` — MIDI end versus final pYIN-voiced frame
+- `audio_duration_mismatch_s` — MIDI end versus the full vocals WAV, including trailing audio
 
-Redirect stdout to a file to save measurements for an `assessment.md` report:
-```bash
-python scripts/eval_vocal_midi.py <midi> <vocals> <mix> \
-  > research/<date>_<topic>-eval/measurements.json
-```
+Use `--json-out` for a machine-readable report; JSON is also printed to stdout.
 
 ## Dev/test
 ```bash

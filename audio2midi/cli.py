@@ -28,8 +28,9 @@ import numpy as np
 from audio2midi.downloader import YouTubeDownloader
 from audio2midi.exceptions import Audio2MidiError
 from audio2midi.extractor import extract_to_wav
+from audio2midi.logging_config import configure_logging
 from audio2midi.midi_writer import write_midi_file
-from audio2midi.models import Instrument
+from audio2midi.models import DownloadResult, Instrument
 from audio2midi.postprocess import postprocess_transcription
 from audio2midi.preprocess import preprocess_wav_file
 from audio2midi.transcribers.base import create_transcriber
@@ -88,11 +89,16 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="audio2midi",
         description=(
-            "Transcribe vocal performances from YouTube into MIDI using RMVPE pitch tracking. "
-            "Also supports piano and guitar. Runs completely on-device after download."
+            "Transcribe local or YouTube vocal performances into MIDI using RMVPE "
+            "pitch tracking. Also supports piano and guitar."
         ),
     )
-    parser.add_argument("--youtube-url", required=True, help="YouTube video URL.")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--youtube-url", help="YouTube video URL.")
+    source.add_argument(
+        "--input-file",
+        help="Local audio or video file to transcribe instead of downloading YouTube media.",
+    )
     parser.add_argument(
         "--output",
         default=None,
@@ -228,18 +234,28 @@ def run_pipeline(args: argparse.Namespace) -> Path:
 
     _project_root = Path(__file__).resolve().parents[1]
 
-    # Use a temporary workdir for the initial download so we can derive the video name.
+    # Use a temporary workdir for an initial download so we can derive the video name.
     tmp_workdir = (
         Path(args.workdir).expanduser().resolve()
         if args.workdir
         else _project_root / ".cache" / "audio2midi_tmp"
     )
-    downloader = YouTubeDownloader(
-        workdir=tmp_workdir,
-        retries=args.retries,
-        allow_playlist=args.allow_playlist,
-    )
-    download_result = downloader.download(args.youtube_url)
+    if args.input_file:
+        input_path = Path(args.input_file).expanduser().resolve()
+        if not input_path.is_file():
+            raise Audio2MidiError(f"Local input file not found: {input_path}")
+        download_result = DownloadResult(
+            video_id=input_path.stem,
+            title=input_path.stem,
+            media_path=input_path,
+        )
+    else:
+        downloader = YouTubeDownloader(
+            workdir=tmp_workdir,
+            retries=args.retries,
+            allow_playlist=args.allow_playlist,
+        )
+        download_result = downloader.download(args.youtube_url)
 
     video_name = _sanitize_filename(download_result.title or download_result.video_id)
 
@@ -255,16 +271,19 @@ def run_pipeline(args: argparse.Namespace) -> Path:
     preprocessed_dir = workdir / "preprocessed"
 
     # Move downloaded files into the final workdir if they came from the tmp location.
-    if not args.workdir and not download_result.media_path.is_relative_to(workdir):
+    if (
+        not args.input_file
+        and not args.workdir
+        and not download_result.media_path.is_relative_to(workdir)
+    ):
         import shutil
-        from audio2midi.models import DownloadResult as _DR
         tmp_downloads = tmp_workdir / "downloads"
         dst_downloads = workdir / "downloads"
         if tmp_downloads.exists():
             shutil.copytree(str(tmp_downloads), str(dst_downloads), dirs_exist_ok=True)
             shutil.rmtree(str(tmp_downloads), ignore_errors=True)
         dest = dst_downloads / download_result.media_path.name
-        download_result = _DR(
+        download_result = DownloadResult(
             video_id=download_result.video_id,
             title=download_result.title,
             media_path=dest,
@@ -355,9 +374,9 @@ def main(argv: list[str] | None = None) -> int:
     """CLI main function."""
     parser = _build_parser()
     args = parser.parse_args(argv)
-    logging.basicConfig(
-        level=getattr(logging, args.log_level),
-        format="%(levelname)s %(message)s",
+    configure_logging(
+        level=args.log_level,
+        context=f"argv={argv if argv is not None else sys.argv[1:]}",
     )
     try:
         output = run_pipeline(args)

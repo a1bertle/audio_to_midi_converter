@@ -1,10 +1,12 @@
-numpy>=1.24
-scipy>=1.10,<1.13
+numpy>=2.0,<2.5
+scipy>=1.13,<2.0
 librosa>=0.10.2
 soundfile>=0.12.1
 yt-dlp>=2025.1.26
 mido>=1.3.3
 torch>=2.2
-piano-transcription-inference>=0.0.6
-basic-pitch>=0.3.0
 onnxruntime>=1.17
+audio-separator[cpu]==0.44.1
+# Optional backends are isolated in pyproject.toml extras because Basic Pitch's
+# TensorFlow stack conflicts with the NumPy/ML-dtypes versions required by MBR.
+# demucs>=4.0.0  # optional htdemucs fallback if audio-separator is unavailable

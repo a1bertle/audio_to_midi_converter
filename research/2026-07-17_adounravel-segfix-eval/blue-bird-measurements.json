@@ -1,0 +1,816 @@
+{
+  "midi_properties": {
+    "duration_s": 79.11035793333333,
+    "num_instruments": 1,
+    "total_notes": 218,
+    "pitch_min": 57,
+    "pitch_max": 76,
+    "pitch_range_semitones": 19,
+    "pitch_mean": 67.37155963302752,
+    "pitch_median": 68.0,
+    "note_duration_mean_s": 0.2539607203363916,
+    "note_duration_median_s": 0.1702022999999997,
+    "note_duration_std_s": 0.2733972604562315,
+    "note_duration_min_s": 0.04933399999999821,
+    "note_duration_max_s": 2.349942866666666,
+    "velocity_mean": 80.0,
+    "velocity_std": 0.0,
+    "tempos_bpm": [
+      152.02497263550492
+    ],
+    "ticks_per_beat": 480
+  },
+  "vocals_audio": {
+    "sample_rate": 44100,
+    "duration_s": 99.70650793650793,
+    "peak_dBFS": -3.7324399948120117
+  },
+  "mix_audio": {
+    "sample_rate": 44100,
+    "duration_s": 99.70650793650793,
+    "peak_dBFS": -1.702167272567749
+  },
+  "vocal_activity": {
+    "rms_thresh_db": -40.0,
+    "total_frames": 8589,
+    "voiced_frames": 6032,
+    "voiced_ratio": 0.7022936313889859,
+    "rms_db_mean": -29.89934539794922,
+    "rms_db_peak": 0.0
+  },
+  "pyin_f0": {
+    "total_frames": 8589,
+    "voiced_frames": 5780,
+    "voiced_ratio": 0.6729537780882524,
+    "f0_hz_mean": 447.91182820135776,
+    "f0_hz_median": 415.30469757994507,
+    "f0_midi_mean": 68.29138408304497,
+    "f0_midi_median": 68.0,
+    "f0_midi_min": 55.900000000000006,
+    "f0_midi_max": 94.60000000000001,
+    "f0_midi_range_semitones": 38.7,
+    "final_voiced_s": 83.94013605442177
+  },
+  "pitch_coverage": {
+    "voiced_frames": 5780,
+    "midi_active_frames": 4771,
+    "co_active_frames": 4582,
+    "coverage_ratio": 0.7927335640138409,
+    "hallucination_ratio": 0.039614336617061416,
+    "pitch_error_mean_semitones": 0.2983631601920539,
+    "pitch_error_median_semitones": 0.10000000000000142,
+    "pitch_error_p90_semitones": 0.4000000000000057,
+    "frames_within_half_semitone_pct": 90.92099519860322,
+    "frames_within_one_semitone_pct": 96.76996944565693
+  },
+  "hallucination_regions": {
+    "rms_thresh_db": -40.0,
+    "adjacency_s": 0.1,
+    "region_count": 80,
+    "total_frames": 189,
+    "class_frames": {
+      "onset_or_offset_overhang": 189,
+      "low_energy": 0,
+      "unvoiced_high_energy": 0
+    },
+    "class_ratios": {
+      "onset_or_offset_overhang": 1.0,
+      "low_energy": 0.0,
+      "unvoiced_high_energy": 0.0
+    },
+    "regions": [
+      {
+        "start_s": 1.242267573696145,
+        "end_s": 1.253877551020408,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -27.515016555786133,
+        "rms_db_peak": -27.515016555786133,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 1.4628571428571429,
+        "end_s": 1.474467120181406,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -23.82768440246582,
+        "rms_db_peak": -23.82768440246582,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 4.121541950113379,
+        "end_s": 4.156371882086168,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -40.55401611328125,
+        "rms_db_peak": -38.45592498779297,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 4.423401360544218,
+        "end_s": 4.446621315192743,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -10.678401947021484,
+        "rms_db_peak": -8.618219375610352,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 5.642448979591837,
+        "end_s": 5.6540589569161,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -4.871856689453125,
+        "rms_db_peak": -4.871856689453125,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 6.582857142857143,
+        "end_s": 6.617687074829932,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -25.406837463378906,
+        "rms_db_peak": -24.13750648498535,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 7.534875283446712,
+        "end_s": 7.558095238095238,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -25.24635124206543,
+        "rms_db_peak": -24.39457130432129,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 7.75546485260771,
+        "end_s": 7.790294784580499,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -12.087013244628906,
+        "rms_db_peak": -11.002225875854492,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 10.47219954648526,
+        "end_s": 10.50702947845805,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -47.2645263671875,
+        "rms_db_peak": -33.775543212890625,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 12.132426303854876,
+        "end_s": 12.144036281179138,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -8.504278182983398,
+        "rms_db_peak": -8.504278182983398,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 12.84063492063492,
+        "end_s": 12.898684807256236,
+        "duration_s": 0.058049886621315196,
+        "frame_count": 5,
+        "rms_db_mean": -14.113714218139648,
+        "rms_db_peak": -13.954475402832031,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 14.17578231292517,
+        "end_s": 14.199002267573697,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -21.536067962646484,
+        "rms_db_peak": -20.27790641784668,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 20.387120181405894,
+        "end_s": 20.39873015873016,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -8.548070907592773,
+        "rms_db_peak": -8.548070907592773,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 21.443628117913832,
+        "end_s": 21.478458049886623,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -12.154166221618652,
+        "rms_db_peak": -8.835458755493164,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 21.582947845804988,
+        "end_s": 21.606167800453516,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -13.58417797088623,
+        "rms_db_peak": -10.520706176757812,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 21.954467120181405,
+        "end_s": 21.97768707482993,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -13.649931907653809,
+        "rms_db_peak": -12.59361457824707,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 21.989297052154196,
+        "end_s": 22.024126984126983,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -18.45403480529785,
+        "rms_db_peak": -11.48404312133789,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 23.138684807256237,
+        "end_s": 23.18512471655329,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -21.491636276245117,
+        "rms_db_peak": -19.757753372192383,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 23.73079365079365,
+        "end_s": 23.754013605442175,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -19.708389282226562,
+        "rms_db_peak": -19.48407554626465,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 24.13714285714286,
+        "end_s": 24.18358276643991,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -14.125272750854492,
+        "rms_db_peak": -13.688467025756836,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 25.274920634920633,
+        "end_s": 25.29814058956916,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -16.996501922607422,
+        "rms_db_peak": -16.901060104370117,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 25.518730158730158,
+        "end_s": 25.541950113378686,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -16.469371795654297,
+        "rms_db_peak": -16.15030860900879,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 26.145668934240362,
+        "end_s": 26.157278911564624,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -24.693429946899414,
+        "rms_db_peak": -24.693429946899414,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 26.90031746031746,
+        "end_s": 26.911927437641722,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -24.312349319458008,
+        "rms_db_peak": -24.312349319458008,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 28.293514739229025,
+        "end_s": 28.305124716553287,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -25.593908309936523,
+        "rms_db_peak": -25.593908309936523,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 29.41968253968254,
+        "end_s": 29.431292517006803,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -28.22599220275879,
+        "rms_db_peak": -28.22599220275879,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 30.45297052154195,
+        "end_s": 30.476190476190474,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -19.535293579101562,
+        "rms_db_peak": -12.227935791015625,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 31.05668934240363,
+        "end_s": 31.068299319727892,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -19.8326358795166,
+        "rms_db_peak": -19.8326358795166,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 31.846167800453514,
+        "end_s": 31.857777777777777,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -19.835023880004883,
+        "rms_db_peak": -19.835023880004883,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 32.42666666666667,
+        "end_s": 32.43827664399093,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -49.19940185546875,
+        "rms_db_peak": -49.19940185546875,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 32.612426303854875,
+        "end_s": 32.6356462585034,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -33.53189468383789,
+        "rms_db_peak": -22.94112205505371,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 32.8562358276644,
+        "end_s": 32.86784580498866,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -5.058328628540039,
+        "rms_db_peak": -5.058328628540039,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 34.365532879818595,
+        "end_s": 34.411972789115644,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -13.51727294921875,
+        "rms_db_peak": -13.365859985351562,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 34.78349206349206,
+        "end_s": 34.795102040816325,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -22.758981704711914,
+        "rms_db_peak": -22.758981704711914,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 38.75410430839002,
+        "end_s": 38.78893424036281,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -32.75272750854492,
+        "rms_db_peak": -32.23527526855469,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 38.905034013605444,
+        "end_s": 38.93986394557823,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -33.32107925415039,
+        "rms_db_peak": -32.897621154785156,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 42.4692970521542,
+        "end_s": 42.53895691609977,
+        "duration_s": 0.06965986394557823,
+        "frame_count": 6,
+        "rms_db_mean": -23.24915885925293,
+        "rms_db_peak": -15.799921035766602,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 44.95383219954648,
+        "end_s": 44.98866213151928,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -57.493106842041016,
+        "rms_db_peak": -54.080955505371094,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 45.41823129251701,
+        "end_s": 45.42984126984127,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -6.117362976074219,
+        "rms_db_peak": -6.117362976074219,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 46.509569160997735,
+        "end_s": 46.53278911564626,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -9.980249404907227,
+        "rms_db_peak": -8.63808822631836,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 48.425215419501136,
+        "end_s": 48.44843537414966,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -9.244232177734375,
+        "rms_db_peak": -8.63497543334961,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 48.59936507936508,
+        "end_s": 48.6225850340136,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -17.00788116455078,
+        "rms_db_peak": -12.355606079101562,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 49.841632653061225,
+        "end_s": 49.86485260770975,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -4.992706298828125,
+        "rms_db_peak": -4.8990478515625,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 50.18993197278912,
+        "end_s": 50.21315192743764,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -22.600725173950195,
+        "rms_db_peak": -14.113977432250977,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 50.74721088435374,
+        "end_s": 50.78204081632653,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -23.45844078063965,
+        "rms_db_peak": -22.62299156188965,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 51.76888888888889,
+        "end_s": 51.79210884353741,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -18.073020935058594,
+        "rms_db_peak": -14.33062744140625,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 51.919818594104306,
+        "end_s": 51.94303854875283,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -15.370162010192871,
+        "rms_db_peak": -14.460443496704102,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 51.9546485260771,
+        "end_s": 51.98947845804989,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -12.729694366455078,
+        "rms_db_peak": -12.248075485229492,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 52.15201814058957,
+        "end_s": 52.17523809523809,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -25.58160972595215,
+        "rms_db_peak": -22.617387771606445,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 54.114104308390026,
+        "end_s": 54.19537414965986,
+        "duration_s": 0.08126984126984127,
+        "frame_count": 7,
+        "rms_db_mean": -27.384050369262695,
+        "rms_db_peak": -25.13419532775879,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 54.75265306122449,
+        "end_s": 54.764263038548755,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -1.3927230834960938,
+        "rms_db_peak": -1.3927230834960938,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 55.51891156462585,
+        "end_s": 55.55374149659864,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -8.345170021057129,
+        "rms_db_peak": -4.491903305053711,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 56.122630385487525,
+        "end_s": 56.16907029478458,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -28.02768898010254,
+        "rms_db_peak": -24.582406997680664,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 56.30839002267574,
+        "end_s": 56.343219954648525,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -26.45330810546875,
+        "rms_db_peak": -19.59239387512207,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 57.08625850340136,
+        "end_s": 57.12108843537415,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -12.991023063659668,
+        "rms_db_peak": -12.496671676635742,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 57.88734693877551,
+        "end_s": 57.9221768707483,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -19.453216552734375,
+        "rms_db_peak": -16.877534866333008,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 57.933786848072565,
+        "end_s": 58.0150566893424,
+        "duration_s": 0.08126984126984127,
+        "frame_count": 7,
+        "rms_db_mean": -13.595319747924805,
+        "rms_db_peak": -10.586893081665039,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 59.176054421768704,
+        "end_s": 59.199274376417236,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -12.243500709533691,
+        "rms_db_peak": -9.925430297851562,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 59.38503401360544,
+        "end_s": 59.43147392290249,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -2.494572401046753,
+        "rms_db_peak": -2.1722412109375,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 59.80299319727891,
+        "end_s": 59.81460317460318,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -4.050752639770508,
+        "rms_db_peak": -4.050752639770508,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 61.17297052154195,
+        "end_s": 61.18458049886621,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -58.63567352294922,
+        "rms_db_peak": -58.63567352294922,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 61.41678004535147,
+        "end_s": 61.44,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -20.98568344116211,
+        "rms_db_peak": -12.464149475097656,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 62.78675736961451,
+        "end_s": 62.798367346938775,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -12.311182022094727,
+        "rms_db_peak": -12.311182022094727,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 62.85641723356009,
+        "end_s": 62.87963718820862,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -14.29389762878418,
+        "rms_db_peak": -13.223165512084961,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 63.285986394557824,
+        "end_s": 63.30920634920635,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -24.099403381347656,
+        "rms_db_peak": -21.980798721313477,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 63.37886621315193,
+        "end_s": 63.42530612244898,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -24.041072845458984,
+        "rms_db_peak": -23.307546615600586,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 64.55147392290249,
+        "end_s": 64.57469387755103,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -35.244205474853516,
+        "rms_db_peak": -33.134620666503906,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 65.45705215419501,
+        "end_s": 65.46866213151928,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -4.306392669677734,
+        "rms_db_peak": -4.306392669677734,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 67.37269841269841,
+        "end_s": 67.38430839002268,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -1.2822818756103516,
+        "rms_db_peak": -1.2822818756103516,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 68.15056689342404,
+        "end_s": 68.17378684807257,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -6.336371421813965,
+        "rms_db_peak": -4.904010772705078,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 68.76589569160998,
+        "end_s": 68.80072562358276,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -23.09185218811035,
+        "rms_db_peak": -20.281728744506836,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 68.95165532879818,
+        "end_s": 68.9748752834467,
+        "duration_s": 0.023219954648526078,
+        "frame_count": 2,
+        "rms_db_mean": -15.492361068725586,
+        "rms_db_peak": -11.278135299682617,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 69.70630385487529,
+        "end_s": 69.74113378684807,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -12.334197998046875,
+        "rms_db_peak": -12.252580642700195,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 71.29687074829933,
+        "end_s": 71.3317006802721,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -15.641402244567871,
+        "rms_db_peak": -6.518527984619141,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 71.92380952380952,
+        "end_s": 71.97024943310657,
+        "duration_s": 0.046439909297052155,
+        "frame_count": 4,
+        "rms_db_mean": -19.732349395751953,
+        "rms_db_peak": -12.205467224121094,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 72.10956916099774,
+        "end_s": 72.12117913832199,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -11.37364387512207,
+        "rms_db_peak": -11.37364387512207,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 74.4431746031746,
+        "end_s": 74.47800453514739,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -17.229427337646484,
+        "rms_db_peak": -8.289501190185547,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 75.2326530612245,
+        "end_s": 75.26748299319728,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -14.731371879577637,
+        "rms_db_peak": -7.270929336547852,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 76.01052154195011,
+        "end_s": 76.02213151927438,
+        "duration_s": 0.011609977324263039,
+        "frame_count": 1,
+        "rms_db_mean": -12.259971618652344,
+        "rms_db_peak": -12.259971618652344,
+        "classification": "onset_or_offset_overhang"
+      },
+      {
+        "start_s": 79.07555555555555,
+        "end_s": 79.11038548752835,
+        "duration_s": 0.034829931972789115,
+        "frame_count": 3,
+        "rms_db_mean": -80.0,
+        "rms_db_peak": -80.0,
+        "classification": "onset_or_offset_overhang"
+      }
+    ]
+  },
+  "pitch_histogram": {
+    "pitch_histogram_intersection": 0.9034348235700262
+  },
+  "onset_regularity": {
+    "ioi_mean_s": 0.3579746274961598,
+    "ioi_std_s": 0.5039371518201543,
+    "ioi_cv": 1.4077454464997252,
+    "ioi_min_s": 0.04933399999999999,
+    "ioi_max_s": 5.9299468
+  },
+  "duration_mismatch_s": 4.83,
+  "audio_duration_mismatch_s": 20.596
+}
